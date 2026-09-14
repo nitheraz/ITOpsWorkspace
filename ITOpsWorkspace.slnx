@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="ITOpsWorkspace.App/ITOpsWorkspace.App.csproj" />
+  <Project Path="ITOpsWorkspace.Core/ITOpsWorkspace.Core.csproj" />
+  <Project Path="ITOpsWorkspace.Infrastructure/ITOpsWorkspace.Infrastructure.csproj" />
+  <Project Path="ITOpsWorkspace.Tests/ITOpsWorkspace.Tests.csproj" />
+</Solution>
