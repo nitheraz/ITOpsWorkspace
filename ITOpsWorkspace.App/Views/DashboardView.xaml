@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="ITOpsWorkspace.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Margin="30">
+        <TextBlock Text="Dashboard" FontSize="24" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,20"/>
+
+        <StackPanel Orientation="Horizontal">
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="200">
+                <StackPanel>
+                    <TextBlock Text="My Open" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding MyOpenCount}" Style="{StaticResource StatNumberStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="200">
+                <StackPanel>
+                    <TextBlock Text="Unassigned" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding UnassignedCount}" Style="{StaticResource StatNumberStyle}"/>
+                </StackPanel>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding PriorityFlagCounts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="200">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Label}" Style="{StaticResource StatLabelStyle}"/>
+                                <TextBlock Text="{Binding Count}" Style="{StaticResource StatNumberStyle}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
