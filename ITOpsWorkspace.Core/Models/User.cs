@@ -4,7 +4,7 @@ using System.Text;
 
 namespace ITOpsWorkspace.Core.Models
 {
-    internal class User
+    public class User
     {
     }
 }

@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="ITOpsWorkspace.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Margin="30">
+        <TextBlock Text="Dashboard" FontSize="28" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,24"/>
+
+        <!-- Row 1: workload overview -->
+        <TextBlock Text="Workload" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="190">
+                <StackPanel>
+                    <TextBlock Text="My Open" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding MyOpenCount}" Style="{StaticResource StatNumberStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardStyle}" Width="190">
+                <StackPanel>
+                    <TextBlock Text="Unassigned" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding UnassignedCount}" Style="{StaticResource StatNumberStyle}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Row 2: priority breakdown -->
+        <TextBlock Text="By Priority" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="150">
+                <StackPanel>
+                    <TextBlock Text="Critical" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding CriticalCount}" Style="{StaticResource StatNumberStyle}"
+                               Foreground="{StaticResource DangerBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="150">
+                <StackPanel>
+                    <TextBlock Text="High" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding HighCount}" Style="{StaticResource StatNumberStyle}"
+                               Foreground="{StaticResource WarningBrush}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="150">
+                <StackPanel>
+                    <TextBlock Text="Moderate" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding ModerateCount}" Style="{StaticResource StatNumberStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardStyle}" Width="150">
+                <StackPanel>
+                    <TextBlock Text="Low" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding LowCount}" Style="{StaticResource StatNumberStyle}"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Row 3: custom priority flags (Leadership, Class Affected, etc.) -->
+        <ItemsControl ItemsSource="{Binding PriorityFlagCounts}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="190">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Label}" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock Text="{Binding Count}" Style="{StaticResource StatNumberStyle}"/>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>
