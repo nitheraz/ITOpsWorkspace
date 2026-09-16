@@ -54,8 +54,6 @@ public partial class MyTeamWorkViewModel : ObservableObject
             AssignmentGroupName = _team.AssignmentGroupName
         });
 
-        // Workload reflects the whole team queue regardless of the status filter,
-        // since it's meant to be an overall snapshot, not scoped to the current view.
         var groups = _allTeamIncidents
             .GroupBy(i => string.IsNullOrWhiteSpace(i.AssignedToName) ? "Unassigned" : i.AssignedToName)
             .Select(g => new WorkloadItem { Name = g.Key, Count = g.Count() })
