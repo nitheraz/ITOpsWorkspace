@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="ITOpsWorkspace.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <StackPanel Margin="30" MaxWidth="500" HorizontalAlignment="Left">
+        <TextBlock Text="Settings" FontSize="28" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,24"/>
+
+        <TextBlock Text="Organization" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
+        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+            <StackPanel>
+                <TextBlock Text="Instance URL" Style="{StaticResource StatLabelStyle}"/>
+                <TextBlock Text="{Binding InstanceUrl}" Foreground="{StaticResource TextPrimaryBrush}"
+                           FontSize="15" Margin="0,4,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Account" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
+        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+            <StackPanel>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Display Name" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding DisplayName}" Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="15" Margin="0,4,0,0"/>
+                </StackPanel>
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Username" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding Username}" Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="15" Margin="0,4,0,0"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Assignment Group" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding AssignmentGroupName}" Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="15" Margin="0,4,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <TextBlock Text="Preferences" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
+        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,14">
+            <StackPanel>
+                <TextBlock Text="Auto-lock after inactivity (minutes)" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,6"/>
+                <TextBox Text="{Binding IdleTimeoutMinutes, UpdateSourceTrigger=PropertyChanged}"
+                         Padding="10" Width="120" HorizontalAlignment="Left"
+                         Background="{StaticResource SurfaceBrush}"
+                         Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"/>
+            </StackPanel>
+        </Border>
+
+        <Button Content="Save" Command="{Binding SaveCommand}" Padding="12,8" Cursor="Hand"
+                Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"
+                HorizontalAlignment="Left"/>
+
+        <TextBlock Text="{Binding SaveMessage}" Foreground="{StaticResource SuccessBrush}"
+                   Margin="0,10,0,0"/>
+    </StackPanel>
+</UserControl>

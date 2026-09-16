@@ -7,4 +7,5 @@ public class SettingsEntity
     public byte[] EncryptedPassword { get; set; } = Array.Empty<byte>();
     public string CurrentUserDisplayName { get; set; } = string.Empty;
     public string AssignmentGroupName { get; set; } = string.Empty;
+    public int IdleTimeoutMinutes { get; set; } = 120;
 }

@@ -1,6 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using CommunityToolkit.Mvvm.ComponentModel;
-using ITOpsWorkspace.Core.Enums;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
 
@@ -18,8 +16,6 @@ public partial class DashboardViewModel : ObservableObject
     [ObservableProperty] private int _moderateCount;
     [ObservableProperty] private int _lowCount;
 
-    public ObservableCollection<PriorityFlagCount> PriorityFlagCounts { get; } = new();
-
     public DashboardViewModel(IIncidentSource incidentSource, CurrentUserContext currentUser)
     {
         _incidentSource = incidentSource;
@@ -29,18 +25,22 @@ public partial class DashboardViewModel : ObservableObject
 
     private async Task LoadAsync()
     {
-        var incidents = await _incidentSource.GetIncidentsAsync();
+        MyOpenCount = await _incidentSource.GetIncidentCountAsync(
+            new IncidentQuery { AssignedToName = _currentUser.DisplayName });
 
-        MyOpenCount = incidents.Count(i =>
-            !string.IsNullOrWhiteSpace(_currentUser.DisplayName) &&
-            i.AssignedToName.Equals(_currentUser.DisplayName, StringComparison.OrdinalIgnoreCase));
+        UnassignedCount = await _incidentSource.GetIncidentCountAsync(
+            new IncidentQuery { AssignedToIsEmpty = true });
 
-        UnassignedCount = incidents.Count(i => string.IsNullOrWhiteSpace(i.AssignedToName));
-        CriticalCount = incidents.Count(i => i.Priority == ServiceNowPriority.Critical);
-        HighCount = incidents.Count(i => i.Priority == ServiceNowPriority.High);
-        ModerateCount = incidents.Count(i => i.Priority == ServiceNowPriority.Moderate);
-        LowCount = incidents.Count(i => i.Priority == ServiceNowPriority.Low);
+        CriticalCount = await _incidentSource.GetIncidentCountAsync(
+            new IncidentQuery { PriorityValue = "1" });
 
-        PriorityFlagCounts.Clear();
+        HighCount = await _incidentSource.GetIncidentCountAsync(
+            new IncidentQuery { PriorityValue = "2" });
+
+        ModerateCount = await _incidentSource.GetIncidentCountAsync(
+            new IncidentQuery { PriorityValue = "3" });
+
+        LowCount = await _incidentSource.GetIncidentCountAsync(
+            new IncidentQuery { PriorityValue = "4" });
     }
 }

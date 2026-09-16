@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
+using ITOpsWorkspace.App.Services;
 using ITOpsWorkspace.Core.Interfaces;
 
 namespace ITOpsWorkspace.App.ViewModels;
@@ -10,6 +9,7 @@ namespace ITOpsWorkspace.App.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly IUserSettingsService _userSettingsService;
+    private readonly INavigationService _navigationService;
 
     [ObservableProperty] private string _currentScreen = "Dashboard";
     [ObservableProperty] private object? _currentViewModel;
@@ -20,9 +20,14 @@ public partial class MainWindowViewModel : ObservableObject
         "Playbooks", "Knowledge", "Tools", "Reports", "Settings"
     };
 
-    public MainWindowViewModel(DashboardViewModel dashboardViewModel, IUserSettingsService userSettingsService)
+    public MainWindowViewModel(DashboardViewModel dashboardViewModel, IUserSettingsService userSettingsService,
+        INavigationService navigationService)
     {
         _userSettingsService = userSettingsService;
+        _navigationService = navigationService;
+
+        _navigationService.CurrentViewModelChanged += vm => CurrentViewModel = vm;
+
         CurrentViewModel = dashboardViewModel;
     }
 
@@ -35,6 +40,7 @@ public partial class MainWindowViewModel : ObservableObject
             "Dashboard" => App.Services.GetRequiredService<DashboardViewModel>(),
             "My Work" => App.Services.GetRequiredService<MyWorkViewModel>(),
             "My Team Work" => App.Services.GetRequiredService<MyTeamWorkViewModel>(),
+            "Settings" => App.Services.GetRequiredService<SettingsViewModel>(),
             _ => null
         };
     }
@@ -44,11 +50,9 @@ public partial class MainWindowViewModel : ObservableObject
     {
         await _userSettingsService.ClearAsync();
 
-        // Relaunch as a fresh process so the app restarts cleanly at Login,
-        // rather than trying to tear down and rebuild the DI container in place.
-        var exePath = Process.GetCurrentProcess().MainModule?.FileName;
+        var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
         if (!string.IsNullOrEmpty(exePath))
-            Process.Start(exePath);
+            System.Diagnostics.Process.Start(exePath);
 
         System.Windows.Application.Current.Shutdown();
     }

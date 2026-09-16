@@ -1,18 +1,16 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using System.Windows.Threading;
-using Microsoft.Extensions.DependencyInjection;
+﻿using ITOpsWorkspace.App.Services;
 using ITOpsWorkspace.App.ViewModels;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
 using ITOpsWorkspace.Infrastructure.Integrations;
+using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace ITOpsWorkspace.App;
 
 public partial class MainWindow : Window
 {
-    private static readonly TimeSpan IdleThreshold = TimeSpan.FromHours(2); // TODO: move to Settings once that screen exists
-
     private readonly DispatcherTimer _idleCheckTimer;
     private DateTime _lastActivityUtc = DateTime.UtcNow;
     private bool _isLocked;
@@ -34,7 +32,10 @@ public partial class MainWindow : Window
     {
         if (_isLocked) return;
 
-        if (DateTime.UtcNow - _lastActivityUtc >= IdleThreshold)
+        var appSettingsState = App.Services.GetRequiredService<AppSettingsState>();
+        var idleThreshold = TimeSpan.FromMinutes(appSettingsState.IdleTimeoutMinutes);
+
+        if (DateTime.UtcNow - _lastActivityUtc >= idleThreshold)
         {
             ShowLockScreen();
         }
@@ -59,7 +60,6 @@ public partial class MainWindow : Window
         }
         else
         {
-            // Lock screen was somehow dismissed without a successful unlock — treat as a hard exit.
             System.Windows.Application.Current.Shutdown();
         }
     }

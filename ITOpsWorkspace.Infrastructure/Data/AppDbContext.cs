@@ -6,7 +6,7 @@ namespace ITOpsWorkspace.Infrastructure.Data;
 public class AppDbContext : DbContext
 {
     public DbSet<SettingsEntity> Settings => Set<SettingsEntity>();
-    public DbSet<PriorityFlag> PriorityFlags => Set<PriorityFlag>();
+    //public DbSet<PriorityFlag> PriorityFlags => Set<PriorityFlag>();
 
     private readonly string _dbPath;
 

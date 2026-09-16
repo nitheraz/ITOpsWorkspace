@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using ITOpsWorkspace.App.Services;
 using ITOpsWorkspace.App.ViewModels;
 using ITOpsWorkspace.App.Views;
 using ITOpsWorkspace.Core.Interfaces;
@@ -18,8 +19,20 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Prevent WPF from shutting the app down between dialog windows
-        // (Org Setup -> Login -> MainWindow) when no window is briefly open.
+        try
+        {
+            await StartAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Startup failed:\n\n{ex}", "ITOpsWorkspace — Startup Error",
+                MessageBoxButton.OK, MessageBoxImage.Error);
+            Shutdown();
+        }
+    }
+
+    private async Task StartAsync()
+    {
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         var orgSettingsPath = Path.Combine(
@@ -85,8 +98,10 @@ public partial class App : Application
         services.AddSingleton<IOrgSettingsService>(orgSettingsService);
         services.AddSingleton<IUserSettingsService>(userSettingsService);
         services.AddSingleton<IUserLookupService>(userLookupService);
+        services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton(orgSettings);
         services.AddSingleton(userSettings);
+        services.AddSingleton(new AppSettingsState { IdleTimeoutMinutes = userSettings.IdleTimeoutMinutes });
 
         var options = new ServiceNowOptions
         {
@@ -104,6 +119,7 @@ public partial class App : Application
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<MyWorkViewModel>();
         services.AddTransient<MyTeamWorkViewModel>();
+        services.AddTransient<SettingsViewModel>();
         services.AddTransient<MainWindowViewModel>();
 
         Services = services.BuildServiceProvider();
@@ -113,8 +129,8 @@ public partial class App : Application
             DataContext = Services.GetRequiredService<MainWindowViewModel>()
         };
 
-        MainWindow = mainWindow; // register as the app's real main window
-        ShutdownMode = ShutdownMode.OnMainWindowClose; // now safe to shut down when this closes
+        MainWindow = mainWindow;
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
         mainWindow.Show();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ITOpsWorkspace.App.Services;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
 
@@ -10,6 +11,7 @@ public partial class MyTeamWorkViewModel : ObservableObject
 {
     private readonly IIncidentSource _incidentSource;
     private readonly TeamContext _team;
+    private readonly INavigationService _navigationService;
 
     private List<Incident> _allTeamIncidents = new();
     private List<Incident> _filteredIncidents = new();
@@ -20,7 +22,6 @@ public partial class MyTeamWorkViewModel : ObservableObject
     public ObservableCollection<WorkloadItem> Workload { get; } = new();
 
     [ObservableProperty] private bool _isLoading;
-    [ObservableProperty] private Incident? _selectedIncident;
     [ObservableProperty] private string _statusFilter = "Active";
 
     [ObservableProperty]
@@ -38,10 +39,15 @@ public partial class MyTeamWorkViewModel : ObservableObject
 
     public List<string> StatusFilters { get; } = new() { "Active", "All", "Resolved", "Closed" };
 
-    public MyTeamWorkViewModel(IIncidentSource incidentSource, TeamContext team)
+    /*public string DebugAssignmentGroupName => string.IsNullOrWhiteSpace(_team.AssignmentGroupName)
+        ? "(none — no group found for this user)"
+        : _team.AssignmentGroupName;*/
+
+    public MyTeamWorkViewModel(IIncidentSource incidentSource, TeamContext team, INavigationService navigationService)
     {
         _incidentSource = incidentSource;
         _team = team;
+        _navigationService = navigationService;
         _ = LoadAsync();
     }
 
@@ -129,10 +135,8 @@ public partial class MyTeamWorkViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ToggleSelect(Incident incident)
+    private void OpenIncident(Incident incident)
     {
-        SelectedIncident = SelectedIncident?.ServiceNowSysId == incident.ServiceNowSysId
-            ? null
-            : incident;
+        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(incident, this, _navigationService));
     }
 }

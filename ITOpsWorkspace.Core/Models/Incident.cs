@@ -35,6 +35,5 @@ public class Incident
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public List<IncidentPriorityFlag> PriorityFlags { get; set; } = new();
     public List<IncidentActivity> Activities { get; set; } = new();
 }

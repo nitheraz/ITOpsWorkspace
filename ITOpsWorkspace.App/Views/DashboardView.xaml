@@ -6,7 +6,6 @@
         <TextBlock Text="Dashboard" FontSize="28" FontWeight="Bold"
                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,24"/>
 
-        <!-- Row 1: workload overview -->
         <TextBlock Text="Workload" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
             <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="190">
@@ -23,7 +22,6 @@
             </Border>
         </StackPanel>
 
-        <!-- Row 2: priority breakdown -->
         <TextBlock Text="By Priority" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
             <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="150">
@@ -53,24 +51,5 @@
                 </StackPanel>
             </Border>
         </StackPanel>
-
-        <!-- Row 3: custom priority flags (Leadership, Class Affected, etc.) -->
-        <ItemsControl ItemsSource="{Binding PriorityFlagCounts}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0" Width="190">
-                        <StackPanel>
-                            <TextBlock Text="{Binding Label}" Style="{StaticResource StatLabelStyle}"/>
-                            <TextBlock Text="{Binding Count}" Style="{StaticResource StatNumberStyle}"/>
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
     </StackPanel>
 </UserControl>

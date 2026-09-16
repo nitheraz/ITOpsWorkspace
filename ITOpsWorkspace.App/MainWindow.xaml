@@ -18,6 +18,12 @@
         <DataTemplate DataType="{x:Type vm:MyTeamWorkViewModel}">
             <views:MyTeamWorkView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:IncidentWorkspaceViewModel}">
+            <views:IncidentWorkspaceView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>

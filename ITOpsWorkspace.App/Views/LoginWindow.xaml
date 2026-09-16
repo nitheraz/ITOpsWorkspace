@@ -25,7 +25,8 @@
                          Background="{StaticResource SurfaceBrush}"
                          Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"/>
 
-            <Button Content="Log In" Click="OnLoginClicked" Padding="12" Cursor="Hand"
+            <Button Content="Log In" Click="OnLoginClicked" IsDefault="True"
+                    Padding="12" Cursor="Hand"
                     Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
         </StackPanel>
 
@@ -36,7 +37,6 @@
                        Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,10"
                        TextWrapping="Wrap"/>
 
-            <!-- TEMPORARY DEBUG LINE — remove once group fetching is confirmed correct -->
             <TextBlock Text="{Binding DebugGroupCount}" Foreground="{StaticResource WarningBrush}"
                        FontSize="12" Margin="0,0,0,14"/>
 
@@ -45,7 +45,8 @@
                       ItemsSource="{Binding AvailableGroups}" SelectedItem="{Binding SelectedGroup}"
                       Height="40" Margin="0,0,0,20"/>
 
-            <Button Content="Continue" Click="OnConfirmGroupClicked" Padding="12" Cursor="Hand"
+            <Button Content="Continue" Click="OnConfirmGroupClicked" IsDefault="True"
+                    Padding="12" Cursor="Hand"
                     Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
         </StackPanel>
 

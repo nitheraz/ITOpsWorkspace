@@ -32,14 +32,9 @@ public class ServiceNowIncidentSource : IIncidentSource
                    "&sysparm_display_value=all" +
                    $"&sysparm_fields={fields}";
 
-        if (!string.IsNullOrWhiteSpace(query.AssignedToName))
-        {
-            url += $"&sysparm_query=assigned_to.name={HttpUtility.UrlEncode(query.AssignedToName)}";
-        }
-        else if (!string.IsNullOrWhiteSpace(query.AssignmentGroupName))
-        {
-            url += $"&sysparm_query=assignment_group.name={HttpUtility.UrlEncode(query.AssignmentGroupName)}";
-        }
+        var queryString = BuildQueryString(query);
+        if (queryString is not null)
+            url += $"&sysparm_query={queryString}";
 
         var response = await _client.GetAsync(url);
         response.EnsureSuccessStatusCode();
@@ -72,8 +67,55 @@ public class ServiceNowIncidentSource : IIncidentSource
             .ToList();
     }
 
+    public async Task<int> GetIncidentCountAsync(IncidentQuery query)
+    {
+        var url = "/api/now/stats/incident?sysparm_count=true";
+
+        var queryString = BuildQueryString(query);
+        if (queryString is not null)
+            url += $"&sysparm_query={queryString}";
+
+        var response = await _client.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+
+        var result = doc.RootElement.GetProperty("result");
+        if (!result.TryGetProperty("stats", out var stats) || !stats.TryGetProperty("count", out var countProp))
+            return 0;
+
+        return countProp.ValueKind switch
+        {
+            JsonValueKind.String when int.TryParse(countProp.GetString(), out var parsed) => parsed,
+            JsonValueKind.Number => countProp.GetInt32(),
+            _ => 0
+        };
+    }
+
     public Task<Incident?> GetIncidentByIdAsync(string number) => Task.FromResult<Incident?>(null);
     public Task UpdateIncidentStatusAsync(string number, string status) => Task.CompletedTask;
+
+    // Shared by GetIncidentsAsync and GetIncidentCountAsync so both stay in sync
+    // as we add more filterable fields over time.
+    private static string? BuildQueryString(IncidentQuery query)
+    {
+        var clauses = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(query.AssignedToName))
+            clauses.Add($"assigned_to.name={HttpUtility.UrlEncode(query.AssignedToName)}");
+
+        if (!string.IsNullOrWhiteSpace(query.AssignmentGroupName))
+            clauses.Add($"assignment_group.name={HttpUtility.UrlEncode(query.AssignmentGroupName)}");
+
+        if (query.AssignedToIsEmpty)
+            clauses.Add("assigned_toISEMPTY");
+
+        if (!string.IsNullOrWhiteSpace(query.PriorityValue))
+            clauses.Add($"priority={query.PriorityValue}");
+
+        return clauses.Count > 0 ? string.Join("^", clauses) : null;
+    }
 
     private static string GetRawValue(JsonElement item, string field)
     {

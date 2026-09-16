@@ -35,7 +35,8 @@ public class UserSettingsService : IUserSettingsService
             Username = entity.Username,
             Password = CredentialProtector.Unprotect(entity.EncryptedPassword),
             CurrentUserDisplayName = entity.CurrentUserDisplayName,
-            AssignmentGroupName = entity.AssignmentGroupName
+            AssignmentGroupName = entity.AssignmentGroupName,
+            IdleTimeoutMinutes = entity.IdleTimeoutMinutes
         };
     }
 
@@ -50,6 +51,7 @@ public class UserSettingsService : IUserSettingsService
         entity.EncryptedPassword = CredentialProtector.Protect(settings.Password);
         entity.CurrentUserDisplayName = settings.CurrentUserDisplayName;
         entity.AssignmentGroupName = settings.AssignmentGroupName;
+        entity.IdleTimeoutMinutes = settings.IdleTimeoutMinutes;
 
         if (!await db.Settings.AnyAsync(s => s.Id == entity.Id))
             db.Settings.Add(entity);
