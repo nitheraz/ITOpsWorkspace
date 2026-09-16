@@ -11,11 +11,32 @@ public partial class MyTeamWorkViewModel : ObservableObject
     private readonly IIncidentSource _incidentSource;
     private readonly TeamContext _team;
 
+    private List<Incident> _allTeamIncidents = new();
+    private List<Incident> _filteredIncidents = new();
+
+    private const int PageSize = 10;
+
     public ObservableCollection<Incident> TeamIncidents { get; } = new();
     public ObservableCollection<WorkloadItem> Workload { get; } = new();
 
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private Incident? _selectedIncident;
+    [ObservableProperty] private string _statusFilter = "Active";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private int _currentPage = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private int _totalPages = 1;
+
+    public bool CanGoPrevious => CurrentPage > 1;
+    public bool CanGoNext => CurrentPage < TotalPages;
+
+    public List<string> StatusFilters { get; } = new() { "Active", "All", "Resolved", "Closed" };
 
     public MyTeamWorkViewModel(IIncidentSource incidentSource, TeamContext team)
     {
@@ -28,17 +49,14 @@ public partial class MyTeamWorkViewModel : ObservableObject
     {
         IsLoading = true;
 
-        var incidents = await _incidentSource.GetIncidentsAsync(new IncidentQuery
+        _allTeamIncidents = await _incidentSource.GetIncidentsAsync(new IncidentQuery
         {
-            AssignedToNames = _team.MemberNames,
-            IncludeUnassigned = true
+            AssignmentGroupName = _team.AssignmentGroupName
         });
 
-        TeamIncidents.Clear();
-        foreach (var incident in incidents)
-            TeamIncidents.Add(incident);
-
-        var groups = incidents
+        // Workload reflects the whole team queue regardless of the status filter,
+        // since it's meant to be an overall snapshot, not scoped to the current view.
+        var groups = _allTeamIncidents
             .GroupBy(i => string.IsNullOrWhiteSpace(i.AssignedToName) ? "Unassigned" : i.AssignedToName)
             .Select(g => new WorkloadItem { Name = g.Key, Count = g.Count() })
             .OrderByDescending(w => w.Count);
@@ -47,7 +65,69 @@ public partial class MyTeamWorkViewModel : ObservableObject
         foreach (var item in groups)
             Workload.Add(item);
 
+        ApplyFilter();
+
         IsLoading = false;
+    }
+
+    [RelayCommand]
+    private void SetStatusFilter(string filter)
+    {
+        StatusFilter = filter;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        IEnumerable<Incident> filtered = StatusFilter switch
+        {
+            "Active" => _allTeamIncidents.Where(i =>
+                i.StateDisplay.Contains("New", StringComparison.OrdinalIgnoreCase) ||
+                i.StateDisplay.Contains("In Progress", StringComparison.OrdinalIgnoreCase)),
+            "Resolved" => _allTeamIncidents.Where(i =>
+                i.StateDisplay.Contains("Resolved", StringComparison.OrdinalIgnoreCase)),
+            "Closed" => _allTeamIncidents.Where(i =>
+                i.StateDisplay.Contains("Closed", StringComparison.OrdinalIgnoreCase)),
+            _ => _allTeamIncidents
+        };
+
+        _filteredIncidents = filtered.ToList();
+        CurrentPage = 1;
+        UpdateTotalPages();
+        UpdatePageItems();
+    }
+
+    private void UpdateTotalPages()
+    {
+        TotalPages = Math.Max(1, (int)Math.Ceiling(_filteredIncidents.Count / (double)PageSize));
+        if (CurrentPage > TotalPages) CurrentPage = TotalPages;
+    }
+
+    private void UpdatePageItems()
+    {
+        TeamIncidents.Clear();
+        foreach (var incident in _filteredIncidents.Skip((CurrentPage - 1) * PageSize).Take(PageSize))
+            TeamIncidents.Add(incident);
+    }
+
+    [RelayCommand]
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+            UpdatePageItems();
+        }
+    }
+
+    [RelayCommand]
+    private void PreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage--;
+            UpdatePageItems();
+        }
     }
 
     [RelayCommand]

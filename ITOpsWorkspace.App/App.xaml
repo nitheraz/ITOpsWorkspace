@@ -10,6 +10,8 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:IncidentSelectedToVisibilityConverter x:Key="IncidentSelectedToVisibilityConverter"/>
             <converters:FilterTabStyleConverter x:Key="FilterTabStyleConverter"/>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

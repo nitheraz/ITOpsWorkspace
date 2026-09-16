@@ -27,21 +27,29 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" Background="{StaticResource SidebarBrush}">
-            <StackPanel Margin="0,24,0,0">
-                <TextBlock Text="ITOpsWorkspace" Foreground="{StaticResource TextPrimaryBrush}"
-                           FontSize="18" FontWeight="Bold" Margin="20,0,0,28"/>
-                <ItemsControl ItemsSource="{Binding NavItems}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Content="{Binding}"
-                                    Style="{StaticResource NavButtonStyle}"
-                                    Command="{Binding DataContext.NavigateToCommand,
-                                              RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+            <DockPanel>
+                <Button DockPanel.Dock="Bottom"
+                        Content="Sign Out"
+                        Style="{StaticResource NavButtonStyle}"
+                        Command="{Binding SignOutCommand}"
+                        Margin="8,0,8,20"/>
+
+                <StackPanel Margin="0,24,0,0">
+                    <TextBlock Text="ITOpsWorkspace" Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="18" FontWeight="Bold" Margin="20,0,0,28"/>
+                    <ItemsControl ItemsSource="{Binding NavItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding}"
+                                        Style="{StaticResource NavButtonStyle}"
+                                        Command="{Binding DataContext.NavigateToCommand,
+                                                  RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </DockPanel>
         </Border>
 
         <Border Grid.Column="1" Background="{StaticResource BackgroundBrush}">

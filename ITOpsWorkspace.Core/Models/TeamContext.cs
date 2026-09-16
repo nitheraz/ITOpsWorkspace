@@ -2,10 +2,10 @@
 
 public class TeamContext
 {
-    public List<string> MemberNames { get; }
+    public string AssignmentGroupName { get; }
 
-    public TeamContext(List<string> memberNames)
+    public TeamContext(string assignmentGroupName)
     {
-        MemberNames = memberNames;
+        AssignmentGroupName = assignmentGroupName;
     }
 }

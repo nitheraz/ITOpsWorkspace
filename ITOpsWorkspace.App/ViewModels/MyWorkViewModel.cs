@@ -12,12 +12,28 @@ public partial class MyWorkViewModel : ObservableObject
     private readonly CurrentUserContext _currentUser;
 
     private List<Incident> _allMyIncidents = new();
+    private List<Incident> _filteredIncidents = new();
+
+    private const int PageSize = 10;
 
     public ObservableCollection<Incident> MyIncidents { get; } = new();
 
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private Incident? _selectedIncident;
     [ObservableProperty] private string _statusFilter = "Active";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private int _currentPage = 1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanGoPrevious))]
+    [NotifyPropertyChangedFor(nameof(CanGoNext))]
+    private int _totalPages = 1;
+
+    public bool CanGoPrevious => CurrentPage > 1;
+    public bool CanGoNext => CurrentPage < TotalPages;
 
     public List<string> StatusFilters { get; } = new() { "Active", "All", "Resolved", "Closed" };
 
@@ -32,8 +48,6 @@ public partial class MyWorkViewModel : ObservableObject
     {
         IsLoading = true;
 
-        // Server-side filter — ServiceNow only returns incidents assigned to this person,
-        // so we're never at risk of missing some because of an overall result limit.
         _allMyIncidents = await _incidentSource.GetIncidentsAsync(
             new IncidentQuery { AssignedToName = _currentUser.DisplayName });
 
@@ -51,8 +65,6 @@ public partial class MyWorkViewModel : ObservableObject
 
     private void ApplyFilter()
     {
-        // Safe to filter client-side here — _allMyIncidents is already just this
-        // person's tickets (a small set), not the whole instance.
         IEnumerable<Incident> filtered = StatusFilter switch
         {
             "Active" => _allMyIncidents.Where(i =>
@@ -65,9 +77,43 @@ public partial class MyWorkViewModel : ObservableObject
             _ => _allMyIncidents
         };
 
+        _filteredIncidents = filtered.ToList();
+        CurrentPage = 1;
+        UpdateTotalPages();
+        UpdatePageItems();
+    }
+
+    private void UpdateTotalPages()
+    {
+        TotalPages = Math.Max(1, (int)Math.Ceiling(_filteredIncidents.Count / (double)PageSize));
+        if (CurrentPage > TotalPages) CurrentPage = TotalPages;
+    }
+
+    private void UpdatePageItems()
+    {
         MyIncidents.Clear();
-        foreach (var incident in filtered)
+        foreach (var incident in _filteredIncidents.Skip((CurrentPage - 1) * PageSize).Take(PageSize))
             MyIncidents.Add(incident);
+    }
+
+    [RelayCommand]
+    private void NextPage()
+    {
+        if (CurrentPage < TotalPages)
+        {
+            CurrentPage++;
+            UpdatePageItems();
+        }
+    }
+
+    [RelayCommand]
+    private void PreviousPage()
+    {
+        if (CurrentPage > 1)
+        {
+            CurrentPage--;
+            UpdatePageItems();
+        }
     }
 
     [RelayCommand]

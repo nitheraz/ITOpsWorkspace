@@ -32,19 +32,14 @@ public class ServiceNowIncidentSource : IIncidentSource
                    "&sysparm_display_value=all" +
                    $"&sysparm_fields={fields}";
 
-        var clauses = new List<string>();
-
-        if (query.IncludeUnassigned)
-            clauses.Add("assigned_toISEMPTY");
-
         if (!string.IsNullOrWhiteSpace(query.AssignedToName))
-            clauses.Add($"assigned_to.name={HttpUtility.UrlEncode(query.AssignedToName)}");
-
-        foreach (var name in query.AssignedToNames)
-            clauses.Add($"assigned_to.name={HttpUtility.UrlEncode(name)}");
-
-        if (clauses.Count > 0)
-            url += "&sysparm_query=" + string.Join("^OR", clauses);
+        {
+            url += $"&sysparm_query=assigned_to.name={HttpUtility.UrlEncode(query.AssignedToName)}";
+        }
+        else if (!string.IsNullOrWhiteSpace(query.AssignmentGroupName))
+        {
+            url += $"&sysparm_query=assignment_group.name={HttpUtility.UrlEncode(query.AssignmentGroupName)}";
+        }
 
         var response = await _client.GetAsync(url);
         response.EnsureSuccessStatusCode();
