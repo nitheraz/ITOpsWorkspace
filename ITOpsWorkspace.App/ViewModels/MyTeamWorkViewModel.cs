@@ -12,6 +12,7 @@ public partial class MyTeamWorkViewModel : ObservableObject
     private readonly IIncidentSource _incidentSource;
     private readonly TeamContext _team;
     private readonly INavigationService _navigationService;
+    private readonly CurrentUserContext _currentUser;
 
     private List<Incident> _allTeamIncidents = new();
     private List<Incident> _filteredIncidents = new();
@@ -39,15 +40,17 @@ public partial class MyTeamWorkViewModel : ObservableObject
 
     public List<string> StatusFilters { get; } = new() { "Active", "All", "Resolved", "Closed" };
 
-    /*public string DebugAssignmentGroupName => string.IsNullOrWhiteSpace(_team.AssignmentGroupName)
+    public string DebugAssignmentGroupName => string.IsNullOrWhiteSpace(_team.AssignmentGroupName)
         ? "(none — no group found for this user)"
-        : _team.AssignmentGroupName;*/
+        : _team.AssignmentGroupName;
 
-    public MyTeamWorkViewModel(IIncidentSource incidentSource, TeamContext team, INavigationService navigationService)
+    public MyTeamWorkViewModel(IIncidentSource incidentSource, TeamContext team, INavigationService navigationService,
+        CurrentUserContext currentUser)
     {
         _incidentSource = incidentSource;
         _team = team;
         _navigationService = navigationService;
+        _currentUser = currentUser;
         _ = LoadAsync();
     }
 
@@ -137,6 +140,6 @@ public partial class MyTeamWorkViewModel : ObservableObject
     [RelayCommand]
     private void OpenIncident(Incident incident)
     {
-        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(incident, this, _navigationService));
+        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(incident, this, _navigationService, _incidentSource, _currentUser));
     }
 }

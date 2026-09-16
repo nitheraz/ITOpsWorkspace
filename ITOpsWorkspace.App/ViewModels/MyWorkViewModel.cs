@@ -121,6 +121,6 @@ public partial class MyWorkViewModel : ObservableObject
     [RelayCommand]
     private void OpenIncident(Incident incident)
     {
-        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(incident, this, _navigationService));
+        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(incident, this, _navigationService, _incidentSource, _currentUser));
     }
 }

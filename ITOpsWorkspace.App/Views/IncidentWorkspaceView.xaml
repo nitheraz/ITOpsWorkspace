@@ -10,7 +10,6 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
 
-                <!-- Header -->
                 <Grid Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -22,10 +21,41 @@
                                FontSize="14" Foreground="{StaticResource TextSecondaryBrush}"/>
                 </Grid>
                 <TextBlock Text="{Binding Incident.Title}" FontSize="26" FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,24"
+                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,20"
                            TextWrapping="Wrap"/>
 
-                <!-- Summary -->
+                <TextBlock Text="{Binding ActionMessage}" Foreground="{StaticResource SuccessBrush}"
+                           FontSize="13" Margin="0,0,0,16"/>
+
+                <!-- Quick Actions -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Quick Actions" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,12"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Grid.Column="0" Content="Assign to Me" Command="{Binding AssignToMeCommand}"
+                                    Padding="12,8" Cursor="Hand"
+                                    Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
+
+                            <ComboBox Grid.Column="2" Style="{StaticResource DarkComboBoxStyle}"
+                                      ItemsSource="{Binding StateOptions}" DisplayMemberPath="Label"
+                                      SelectedItem="{Binding SelectedStateOption}" Height="36"/>
+
+                            <Button Grid.Column="4" Content="Apply Status" Command="{Binding ApplyStatusCommand}"
+                                    Padding="12,8" Cursor="Hand"
+                                    Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Understand: summary -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="Description" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
@@ -35,8 +65,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Key info cards -->
-                <UniformGrid Columns="4" Margin="0,0,0,20">
+                <UniformGrid Columns="4" Margin="0,0,0,24">
                     <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
                         <StackPanel>
                             <TextBlock Text="Requester" Style="{StaticResource StatLabelStyle}"/>
@@ -77,11 +106,89 @@
                     </Border>
                 </UniformGrid>
 
-                <!-- Placeholder for future work — being upfront rather than faking data -->
-                <Border Style="{StaticResource CardStyle}">
-                    <TextBlock Text="Activity timeline and suggested actions are planned for a future update."
-                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" TextWrapping="Wrap"/>
+                <!-- Troubleshoot -->
+                <TextBlock Text="Troubleshoot" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12"
+                        Visibility="{Binding IsLoadingArticles, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Searching Knowledge Base..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
                 </Border>
+
+                <ItemsControl ItemsSource="{Binding TroubleshootingArticles}" Margin="0,0,0,20">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                                <Button Style="{StaticResource RowButtonStyle}"
+                                        Command="{Binding DataContext.OpenArticleCommand,
+                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        HorizontalContentAlignment="Stretch" Cursor="Hand">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Number}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding ShortDescription}"
+                                                   Foreground="{StaticResource AccentBrush}" FontSize="14"
+                                                   TextWrapping="Wrap"/>
+                                    </Grid>
+                                </Button>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Update: work notes -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Add Work Note" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding NewWorkNote, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" TextWrapping="Wrap" Height="70"
+                                 Padding="10" Margin="0,0,0,10"
+                                 Background="{StaticResource SurfaceBrush}"
+                                 Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"/>
+                        <Button Content="Add Note" Command="{Binding AddWorkNoteCommand}"
+                                Padding="12,8" Cursor="Hand" HorizontalAlignment="Left"
+                                Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="Activity" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12"
+                        Visibility="{Binding IsLoadingActivity, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Loading activity..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
+                </Border>
+
+                <ItemsControl ItemsSource="{Binding Activity}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" FontSize="14">
+                                            <Run Text="{Binding Author}" FontWeight="Bold"
+                                                 Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <Run Text=" — "/>
+                                            <Run Text="{Binding Type}" Foreground="{StaticResource AccentBrush}"/>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Timestamp, StringFormat='{}{0:MMM d, h:mm tt}'}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                    </Grid>
+                                    <TextBlock Text="{Binding Text}" Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontSize="14" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
             </StackPanel>
         </ScrollViewer>
