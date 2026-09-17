@@ -3,6 +3,7 @@ using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ITOpsWorkspace.App.Services;
+using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
 
@@ -14,6 +15,7 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     private readonly INavigationService _navigationService;
     private readonly IIncidentSource _incidentSource;
     private readonly IPlaybookService _playbookService;
+    private readonly IAssistantService _assistantService;
     private readonly CurrentUserContext _currentUser;
 
     [ObservableProperty] private Incident _incident;
@@ -22,18 +24,21 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     public ObservableCollection<IncidentStateOption> StateOptions { get; } = new();
     public ObservableCollection<KnowledgeArticle> TroubleshootingArticles { get; } = new();
     public ObservableCollection<Playbook> MatchedPlaybooks { get; } = new();
+    public ObservableCollection<AssistantMessage> ChatMessages { get; } = new();
 
     [ObservableProperty] private PlaybookRun? _activeRun;
     [ObservableProperty] private IncidentStateOption? _selectedStateOption;
     [ObservableProperty] private string _newWorkNote = string.Empty;
+    [ObservableProperty] private string _chatInput = string.Empty;
     [ObservableProperty] private bool _isLoadingActivity;
     [ObservableProperty] private bool _isLoadingArticles;
+    [ObservableProperty] private bool _isChatBusy;
     [ObservableProperty] private bool _isSaving;
     [ObservableProperty] private string _actionMessage = string.Empty;
 
     public IncidentWorkspaceViewModel(Incident incident, object originViewModel,
         INavigationService navigationService, IIncidentSource incidentSource,
-        IPlaybookService playbookService, CurrentUserContext currentUser)
+        IPlaybookService playbookService, CurrentUserContext currentUser, IAssistantService assistantService)
     {
         _incident = incident;
         _originViewModel = originViewModel;
@@ -41,11 +46,22 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
         _incidentSource = incidentSource;
         _playbookService = playbookService;
         _currentUser = currentUser;
+        _assistantService = assistantService;
 
         _ = LoadActivityAsync();
         _ = LoadStateOptionsAsync();
         _ = LoadTroubleshootingArticlesAsync();
         _ = LoadPlaybooksAsync();
+        _ = LoadInitialAssistantMessageAsync();
+    }
+
+    private async Task LoadInitialAssistantMessageAsync()
+    {
+        IsChatBusy = true;
+        var greeting = await _assistantService.AskAsync(Incident.Title, Incident.Description, new List<AssistantMessage>(), "");
+        IsChatBusy = false;
+
+        ChatMessages.Add(greeting);
     }
 
     private async Task LoadActivityAsync()
@@ -91,6 +107,47 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
         MatchedPlaybooks.Clear();
         foreach (var p in matched)
             MatchedPlaybooks.Add(p);
+    }
+
+    [RelayCommand]
+    private async Task SendChatMessage()
+    {
+        if (string.IsNullOrWhiteSpace(ChatInput)) return;
+
+        var messageText = ChatInput;
+        ChatInput = string.Empty;
+
+        ChatMessages.Add(new AssistantMessage
+        {
+            Role = AssistantRole.User,
+            Text = messageText,
+            Timestamp = DateTime.UtcNow
+        });
+
+        IsChatBusy = true;
+        var response = await _assistantService.AskAsync(
+            Incident.Title, Incident.Description, ChatMessages.ToList(), messageText);
+        IsChatBusy = false;
+
+        ChatMessages.Add(response);
+    }
+
+    [RelayCommand]
+    private async Task OpenSuggestion(AssistantSuggestion suggestion)
+    {
+        switch (suggestion.Type)
+        {
+            case AssistantSuggestionType.KnowledgeArticle:
+            case AssistantSuggestionType.WebSearch:
+                if (!string.IsNullOrEmpty(suggestion.Url))
+                    Process.Start(new ProcessStartInfo(suggestion.Url) { UseShellExecute = true });
+                break;
+
+            case AssistantSuggestionType.Playbook:
+                if (suggestion.Playbook is not null)
+                    await StartPlaybook(suggestion.Playbook);
+                break;
+        }
     }
 
     [RelayCommand]

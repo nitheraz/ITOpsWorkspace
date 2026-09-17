@@ -102,8 +102,82 @@
                     </Border>
                 </UniformGrid>
 
-                <TextBlock Text="Troubleshoot" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+                <TextBlock Text="Troubleshooting Assistant" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
 
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding ChatMessages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,12">
+                                        <Border CornerRadius="8" Padding="12" MaxWidth="480">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
+                                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Role}" Value="User">
+                                                            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Role}" Value="User">
+                                                                <Setter Property="Foreground" Value="White"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+
+                                        <ItemsControl ItemsSource="{Binding Suggestions}" Margin="0,8,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Content="{Binding Label}"
+                                                            Command="{Binding DataContext.OpenSuggestionCommand,
+                                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource SecondaryButtonStyle}"
+                                                            HorizontalAlignment="Left"
+                                                            HorizontalContentAlignment="Left"
+                                                            Margin="0,0,0,6"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="Thinking..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"
+                                   Margin="0,0,0,8"
+                                   Visibility="{Binding IsChatBusy, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <Grid Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="10"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="ChatInputBox" Grid.Column="0"
+                                     Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}"
+                                     Padding="10" Background="{StaticResource SurfaceBrush}"
+                                     Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"
+                                     KeyDown="ChatInputBox_KeyDown"/>
+                            <Button Grid.Column="2" Content="Send" Command="{Binding SendChatMessageCommand}"
+                                    Style="{StaticResource PrimaryButtonStyle}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Active playbook run -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16"
                         Visibility="{Binding ActiveRun, Converter={StaticResource NullToVisibilityConverter}}">
                     <StackPanel>
@@ -126,6 +200,7 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Matched playbooks (browse-directly path, still available alongside chat) -->
                 <ItemsControl ItemsSource="{Binding MatchedPlaybooks}" Margin="0,0,0,10">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -152,6 +227,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <!-- KB articles (browse-directly path) -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12"
                         Visibility="{Binding IsLoadingArticles, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock Text="Searching Knowledge Base..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>

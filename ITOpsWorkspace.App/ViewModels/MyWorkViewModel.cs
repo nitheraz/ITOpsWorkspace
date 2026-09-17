@@ -13,6 +13,7 @@ public partial class MyWorkViewModel : ObservableObject
     private readonly CurrentUserContext _currentUser;
     private readonly INavigationService _navigationService;
     private readonly IPlaybookService _playbookService;
+    private readonly IAssistantService _assistantService;
 
     private List<Incident> _allMyIncidents = new();
     private List<Incident> _filteredIncidents = new();
@@ -40,12 +41,13 @@ public partial class MyWorkViewModel : ObservableObject
     public List<string> StatusFilters { get; } = new() { "Active", "All", "Resolved", "Closed" };
 
     public MyWorkViewModel(IIncidentSource incidentSource, CurrentUserContext currentUser,
-        INavigationService navigationService, IPlaybookService playbookService)
+        INavigationService navigationService, IPlaybookService playbookService, IAssistantService assistantService)
     {
         _incidentSource = incidentSource;
         _currentUser = currentUser;
         _navigationService = navigationService;
         _playbookService = playbookService;
+        _assistantService = assistantService;
         _ = LoadAsync();
     }
 
@@ -125,6 +127,6 @@ public partial class MyWorkViewModel : ObservableObject
     private void OpenIncident(Incident incident)
     {
         _navigationService.NavigateTo(new IncidentWorkspaceViewModel(
-            incident, this, _navigationService, _incidentSource, _playbookService, _currentUser));
+            incident, this, _navigationService, _incidentSource, _playbookService, _currentUser, _assistantService));
     }
 }

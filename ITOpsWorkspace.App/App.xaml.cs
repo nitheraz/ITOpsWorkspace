@@ -117,6 +117,7 @@ public partial class App : Application
         services.AddSingleton(new TeamContext(userSettings.AssignmentGroupName));
 
         services.AddHttpClient<IIncidentSource, ServiceNowIncidentSource>();
+        services.AddSingleton<IAssistantService, RuleBasedAssistantService>();
 
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<MyWorkViewModel>();
