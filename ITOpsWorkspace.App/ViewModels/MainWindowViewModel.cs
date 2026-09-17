@@ -40,6 +40,7 @@ public partial class MainWindowViewModel : ObservableObject
             "Dashboard" => App.Services.GetRequiredService<DashboardViewModel>(),
             "My Work" => App.Services.GetRequiredService<MyWorkViewModel>(),
             "My Team Work" => App.Services.GetRequiredService<MyTeamWorkViewModel>(),
+            "Playbooks" => App.Services.GetRequiredService<PlaybooksViewModel>(),
             "Settings" => App.Services.GetRequiredService<SettingsViewModel>(),
             _ => null
         };

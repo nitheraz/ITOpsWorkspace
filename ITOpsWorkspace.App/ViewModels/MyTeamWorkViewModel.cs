@@ -13,6 +13,7 @@ public partial class MyTeamWorkViewModel : ObservableObject
     private readonly TeamContext _team;
     private readonly INavigationService _navigationService;
     private readonly CurrentUserContext _currentUser;
+    private readonly IPlaybookService _playbookService;
 
     private List<Incident> _allTeamIncidents = new();
     private List<Incident> _filteredIncidents = new();
@@ -45,12 +46,13 @@ public partial class MyTeamWorkViewModel : ObservableObject
         : _team.AssignmentGroupName;
 
     public MyTeamWorkViewModel(IIncidentSource incidentSource, TeamContext team, INavigationService navigationService,
-        CurrentUserContext currentUser)
+        CurrentUserContext currentUser, IPlaybookService playbookService)
     {
         _incidentSource = incidentSource;
         _team = team;
         _navigationService = navigationService;
         _currentUser = currentUser;
+        _playbookService = playbookService;
         _ = LoadAsync();
     }
 
@@ -140,6 +142,7 @@ public partial class MyTeamWorkViewModel : ObservableObject
     [RelayCommand]
     private void OpenIncident(Incident incident)
     {
-        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(incident, this, _navigationService, _incidentSource, _currentUser));
+        _navigationService.NavigateTo(new IncidentWorkspaceViewModel(
+            incident, this, _navigationService, _incidentSource, _playbookService, _currentUser));
     }
 }

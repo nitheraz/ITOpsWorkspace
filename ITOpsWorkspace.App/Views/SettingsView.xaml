@@ -47,9 +47,8 @@
             </StackPanel>
         </Border>
 
-        <Button Content="Save" Command="{Binding SaveCommand}" Padding="12,8" Cursor="Hand"
-                Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"
-                HorizontalAlignment="Left"/>
+        <Button Content="Save" Command="{Binding SaveCommand}"
+                Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
 
         <TextBlock Text="{Binding SaveMessage}" Foreground="{StaticResource SuccessBrush}"
                    Margin="0,10,0,0"/>

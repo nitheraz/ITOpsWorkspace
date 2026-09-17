@@ -70,6 +70,7 @@ public partial class App : Application
 
         var userSettingsService = new UserSettingsService(userDbPath);
         var userLookupService = new ServiceNowUserLookupService();
+        var playbookService = new PlaybookService(userDbPath);
 
         var hasUserSettings = await userSettingsService.HasSettingsAsync();
         if (!hasUserSettings)
@@ -98,6 +99,7 @@ public partial class App : Application
         services.AddSingleton<IOrgSettingsService>(orgSettingsService);
         services.AddSingleton<IUserSettingsService>(userSettingsService);
         services.AddSingleton<IUserLookupService>(userLookupService);
+        services.AddSingleton<IPlaybookService>(playbookService);
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton(orgSettings);
         services.AddSingleton(userSettings);
@@ -120,6 +122,7 @@ public partial class App : Application
         services.AddTransient<MyWorkViewModel>();
         services.AddTransient<MyTeamWorkViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<PlaybooksViewModel>();
         services.AddTransient<MainWindowViewModel>();
 
         Services = services.BuildServiceProvider();

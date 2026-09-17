@@ -13,6 +13,7 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     private readonly object _originViewModel;
     private readonly INavigationService _navigationService;
     private readonly IIncidentSource _incidentSource;
+    private readonly IPlaybookService _playbookService;
     private readonly CurrentUserContext _currentUser;
 
     [ObservableProperty] private Incident _incident;
@@ -20,7 +21,9 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     public ObservableCollection<ActivityEntry> Activity { get; } = new();
     public ObservableCollection<IncidentStateOption> StateOptions { get; } = new();
     public ObservableCollection<KnowledgeArticle> TroubleshootingArticles { get; } = new();
+    public ObservableCollection<Playbook> MatchedPlaybooks { get; } = new();
 
+    [ObservableProperty] private PlaybookRun? _activeRun;
     [ObservableProperty] private IncidentStateOption? _selectedStateOption;
     [ObservableProperty] private string _newWorkNote = string.Empty;
     [ObservableProperty] private bool _isLoadingActivity;
@@ -29,17 +32,20 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     [ObservableProperty] private string _actionMessage = string.Empty;
 
     public IncidentWorkspaceViewModel(Incident incident, object originViewModel,
-        INavigationService navigationService, IIncidentSource incidentSource, CurrentUserContext currentUser)
+        INavigationService navigationService, IIncidentSource incidentSource,
+        IPlaybookService playbookService, CurrentUserContext currentUser)
     {
         _incident = incident;
         _originViewModel = originViewModel;
         _navigationService = navigationService;
         _incidentSource = incidentSource;
+        _playbookService = playbookService;
         _currentUser = currentUser;
 
         _ = LoadActivityAsync();
         _ = LoadStateOptionsAsync();
         _ = LoadTroubleshootingArticlesAsync();
+        _ = LoadPlaybooksAsync();
     }
 
     private async Task LoadActivityAsync()
@@ -70,6 +76,46 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
         foreach (var article in articles)
             TroubleshootingArticles.Add(article);
         IsLoadingArticles = false;
+    }
+
+    private async Task LoadPlaybooksAsync()
+    {
+        var existingRun = await _playbookService.GetActiveRunAsync(Incident.ServiceNowSysId);
+        if (existingRun is not null)
+        {
+            ActiveRun = existingRun;
+            return;
+        }
+
+        var matched = await _playbookService.SearchPlaybooksAsync(Incident.Title);
+        MatchedPlaybooks.Clear();
+        foreach (var p in matched)
+            MatchedPlaybooks.Add(p);
+    }
+
+    [RelayCommand]
+    private async Task StartPlaybook(Playbook playbook)
+    {
+        var run = await _playbookService.StartRunAsync(playbook.Id, Incident.ServiceNowSysId, Incident.Number);
+        ActiveRun = run;
+        MatchedPlaybooks.Clear();
+    }
+
+    [RelayCommand]
+    private async Task ToggleRunStep(PlaybookRunStepState state)
+    {
+        await _playbookService.SetStepCheckedAsync(state.Id, state.IsChecked);
+    }
+
+    [RelayCommand]
+    private async Task CompleteRun()
+    {
+        if (ActiveRun is null) return;
+
+        await _playbookService.CompleteRunAsync(ActiveRun.Id);
+        ActiveRun = null;
+        ActionMessage = "Playbook completed.";
+        await LoadPlaybooksAsync();
     }
 
     [RelayCommand]

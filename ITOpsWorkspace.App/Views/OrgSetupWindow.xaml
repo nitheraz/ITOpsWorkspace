@@ -21,7 +21,7 @@
         <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}"
                    Margin="0,0,0,14" TextWrapping="Wrap"/>
 
-        <Button Content="Save and Continue" Click="OnSaveClicked" Padding="12" Cursor="Hand"
-                Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
+        <Button Content="Save and Continue" Click="OnSaveClicked" IsDefault="True"
+                Style="{StaticResource PrimaryButtonStyle}"/>
     </StackPanel>
 </Window>

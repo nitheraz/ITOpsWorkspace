@@ -26,8 +26,7 @@
                          Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"/>
 
             <Button Content="Log In" Click="OnLoginClicked" IsDefault="True"
-                    Padding="12" Cursor="Hand"
-                    Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
+                    Style="{StaticResource PrimaryButtonStyle}"/>
         </StackPanel>
 
         <StackPanel Visibility="{Binding IsChoosingGroup, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -46,8 +45,7 @@
                       Height="40" Margin="0,0,0,20"/>
 
             <Button Content="Continue" Click="OnConfirmGroupClicked" IsDefault="True"
-                    Padding="12" Cursor="Hand"
-                    Background="{StaticResource AccentBrush}" Foreground="White" BorderThickness="0"/>
+                    Style="{StaticResource PrimaryButtonStyle}"/>
         </StackPanel>
 
         <TextBlock Text="{Binding ErrorMessage}" Foreground="{StaticResource DangerBrush}"
