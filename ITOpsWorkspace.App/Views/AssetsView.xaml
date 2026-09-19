@@ -1,0 +1,88 @@
+﻿<UserControl x:Class="ITOpsWorkspace.App.Views.AssetsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <DockPanel Margin="30">
+        <TextBlock DockPanel.Dock="Top" Text="Assets" FontSize="28" FontWeight="Bold"
+                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,20"/>
+
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Padding="10" Background="{StaticResource SurfaceBrush}"
+                     Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"/>
+            <Button Grid.Column="2" Content="Search" Command="{Binding SearchCommand}"
+                    Style="{StaticResource PrimaryButtonStyle}"/>
+        </Grid>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Center" Margin="0,16,0,0">
+            <Button Content="Previous" Command="{Binding PreviousPageCommand}" IsEnabled="{Binding CanGoPrevious}"
+                    Padding="14,8" Margin="0,0,10,0" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource RowButtonStyle}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <TextBlock Text="{Binding CurrentPage, StringFormat='Page {0}'}"
+                       VerticalAlignment="Center" Margin="0,0,4,0"/>
+            <TextBlock Text="{Binding TotalPages, StringFormat='of {0}'}"
+                       VerticalAlignment="Center" Margin="0,0,10,0"
+                       Foreground="{StaticResource TextSecondaryBrush}"/>
+            <Button Content="Next" Command="{Binding NextPageCommand}" IsEnabled="{Binding CanGoNext}"
+                    Padding="14,8" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource RowButtonStyle}">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Assets}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12">
+                            <Button Style="{StaticResource RowButtonStyle}"
+                                    Command="{Binding DataContext.OpenAssetCommand,
+                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}"
+                                    HorizontalContentAlignment="Stretch" Cursor="Hand">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="160"/>
+                                        <ColumnDefinition Width="160"/>
+                                        <ColumnDefinition Width="160"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Name}"
+                                               Foreground="{StaticResource TextPrimaryBrush}" FontSize="16"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding ClassName}"
+                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding SiteName}"
+                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding AssignedToName}"
+                                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
+                                </Grid>
+                            </Button>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

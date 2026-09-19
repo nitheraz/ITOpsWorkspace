@@ -117,6 +117,7 @@ public partial class App : Application
         services.AddSingleton(new TeamContext(userSettings.AssignmentGroupName));
 
         services.AddHttpClient<IIncidentSource, ServiceNowIncidentSource>();
+        services.AddHttpClient<IAssetSource, ServiceNowAssetSource>();
         services.AddSingleton<IAssistantService, RuleBasedAssistantService>();
 
         services.AddTransient<DashboardViewModel>();
@@ -124,6 +125,7 @@ public partial class App : Application
         services.AddTransient<MyTeamWorkViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<PlaybooksViewModel>();
+        services.AddTransient<AssetsViewModel>();
         services.AddTransient<MainWindowViewModel>();
 
         Services = services.BuildServiceProvider();

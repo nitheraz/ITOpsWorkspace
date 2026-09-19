@@ -2,10 +2,14 @@
 
 public class Asset
 {
-    public int Id { get; set; }
+    public string ServiceNowSysId { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public string AssetTag { get; set; } = string.Empty;
-    public string Type { get; set; } = string.Empty;
-
-    public List<Incident> Incidents { get; set; } = new();
+    public string SerialNumber { get; set; } = string.Empty;
+    public string Manufacturer { get; set; } = string.Empty;
+    public string Model { get; set; } = string.Empty;
+    public string ClassName { get; set; } = string.Empty;
+    public string AssignedToName { get; set; } = string.Empty;
+    public string SiteName { get; set; } = string.Empty;
+    public string OperationalStatus { get; set; } = string.Empty;
 }

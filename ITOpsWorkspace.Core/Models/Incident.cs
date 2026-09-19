@@ -18,19 +18,10 @@ public class Incident
     public string RequesterName { get; set; } = string.Empty;
     public string AssignedToName { get; set; } = string.Empty;
 
-    public int? RequesterId { get; set; }
-    public User? Requester { get; set; }
+    public string AssetSysId { get; set; } = string.Empty;
+    public string AssetName { get; set; } = string.Empty;
 
     public string LocationText { get; set; } = string.Empty;
-
-    public int? AssetId { get; set; }
-    public Asset? Asset { get; set; }
-
-    public int? AssignedToId { get; set; }
-    public User? AssignedTo { get; set; }
-
-    public int? TeamId { get; set; }
-    public Team? Team { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

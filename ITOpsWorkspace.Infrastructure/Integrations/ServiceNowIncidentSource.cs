@@ -29,7 +29,7 @@ public class ServiceNowIncidentSource : IIncidentSource
     {
         query ??= new IncidentQuery();
 
-        var fields = "sys_id,number,short_description,description,priority,state,assigned_to,caller_id,sys_created_on";
+        var fields = "sys_id,number,short_description,description,priority,state,assigned_to,caller_id,sys_created_on,cmdb_ci";
         var url = $"/api/now/table/incident?sysparm_limit={query.Limit}" +
                    "&sysparm_display_value=all" +
                    $"&sysparm_fields={fields}";
@@ -83,7 +83,7 @@ public class ServiceNowIncidentSource : IIncidentSource
 
     public async Task<Incident?> GetIncidentBySysIdAsync(string sysId)
     {
-        var fields = "sys_id,number,short_description,description,priority,state,assigned_to,caller_id,sys_created_on";
+        var fields = "sys_id,number,short_description,description,priority,state,assigned_to,caller_id,sys_created_on,cmdb_ci";
         var url = $"/api/now/table/incident/{sysId}?sysparm_display_value=all&sysparm_fields={fields}";
 
         var response = await _client.GetAsync(url);
@@ -229,6 +229,8 @@ public class ServiceNowIncidentSource : IIncidentSource
         StateDisplay = GetDisplayValue(item, "state"),
         RequesterName = GetDisplayValue(item, "caller_id"),
         AssignedToName = GetDisplayValue(item, "assigned_to"),
+        AssetSysId = GetRawValue(item, "cmdb_ci"),
+        AssetName = GetDisplayValue(item, "cmdb_ci"),
         CreatedAt = DateTime.TryParse(GetRawValue(item, "sys_created_on"), out var dt) ? dt : DateTime.MinValue
     };
 

@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using ITOpsWorkspace.App.Services;
 using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Interfaces;
@@ -107,6 +108,17 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
         MatchedPlaybooks.Clear();
         foreach (var p in matched)
             MatchedPlaybooks.Add(p);
+    }
+
+    [RelayCommand]
+    private async Task ViewAsset()
+    {
+        if (string.IsNullOrWhiteSpace(Incident.AssetSysId)) return;
+
+        var assetSource = App.Services.GetRequiredService<IAssetSource>();
+        var asset = await assetSource.GetAssetBySysIdAsync(Incident.AssetSysId);
+        if (asset is not null)
+            _navigationService.NavigateTo(new AssetDetailViewModel(asset, this, _navigationService));
     }
 
     [RelayCommand]

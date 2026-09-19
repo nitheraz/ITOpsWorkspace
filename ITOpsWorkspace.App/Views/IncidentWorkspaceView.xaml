@@ -61,7 +61,7 @@
                     </StackPanel>
                 </Border>
 
-                <UniformGrid Columns="4" Margin="0,0,0,24">
+                <UniformGrid Columns="4" Margin="0,0,0,20">
                     <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
                         <StackPanel>
                             <TextBlock Text="Requester" Style="{StaticResource StatLabelStyle}"/>
@@ -101,6 +101,44 @@
                         </StackPanel>
                     </Border>
                 </UniformGrid>
+
+                <!-- Device -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Device" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock FontSize="15" Margin="0,4,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                        <Setter Property="Text" Value="{Binding Incident.AssetName}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Incident.AssetName}" Value="">
+                                                <Setter Property="Text" Value="No linked device"/>
+                                                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="View Asset" Command="{Binding ViewAssetCommand}">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Incident.AssetSysId}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                </Border>
 
                 <TextBlock Text="Troubleshooting Assistant" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
 
@@ -177,7 +215,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Active playbook run -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16"
                         Visibility="{Binding ActiveRun, Converter={StaticResource NullToVisibilityConverter}}">
                     <StackPanel>
@@ -200,7 +237,6 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Matched playbooks (browse-directly path, still available alongside chat) -->
                 <ItemsControl ItemsSource="{Binding MatchedPlaybooks}" Margin="0,0,0,10">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -227,7 +263,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- KB articles (browse-directly path) -->
                 <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12"
                         Visibility="{Binding IsLoadingArticles, Converter={StaticResource BoolToVisibilityConverter}}">
                     <TextBlock Text="Searching Knowledge Base..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
@@ -311,3 +346,4 @@
         </ScrollViewer>
     </DockPanel>
 </UserControl>
+
