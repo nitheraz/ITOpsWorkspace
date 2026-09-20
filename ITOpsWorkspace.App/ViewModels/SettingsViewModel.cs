@@ -15,6 +15,7 @@ public partial class SettingsViewModel : ObservableObject
     public string DisplayName { get; }
     public string Username { get; }
     public string AssignmentGroupName { get; }
+    public string RoleDisplay { get; }
 
     [ObservableProperty] private int _idleTimeoutMinutes;
     [ObservableProperty] private string _saveMessage = string.Empty;
@@ -31,6 +32,7 @@ public partial class SettingsViewModel : ObservableObject
         AssignmentGroupName = string.IsNullOrWhiteSpace(userSettings.AssignmentGroupName)
             ? "(none configured)"
             : userSettings.AssignmentGroupName;
+        RoleDisplay = userSettings.Role.ToString();
 
         IdleTimeoutMinutes = appSettingsState.IdleTimeoutMinutes;
     }
@@ -50,7 +52,6 @@ public partial class SettingsViewModel : ObservableObject
         current.IdleTimeoutMinutes = IdleTimeoutMinutes;
         await _userSettingsService.SaveAsync(current);
 
-        // Apply immediately, without needing to restart the app.
         _appSettingsState.IdleTimeoutMinutes = IdleTimeoutMinutes;
 
         SaveMessage = "Saved.";

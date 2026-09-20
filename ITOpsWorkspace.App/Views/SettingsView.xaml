@@ -28,9 +28,14 @@
                     <TextBlock Text="{Binding Username}" Foreground="{StaticResource TextPrimaryBrush}"
                                FontSize="15" Margin="0,4,0,0"/>
                 </StackPanel>
-                <StackPanel>
+                <StackPanel Margin="0,0,0,12">
                     <TextBlock Text="Assignment Group" Style="{StaticResource StatLabelStyle}"/>
                     <TextBlock Text="{Binding AssignmentGroupName}" Foreground="{StaticResource TextPrimaryBrush}"
+                               FontSize="15" Margin="0,4,0,0"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Role" Style="{StaticResource StatLabelStyle}"/>
+                    <TextBlock Text="{Binding RoleDisplay}" Foreground="{StaticResource TextPrimaryBrush}"
                                FontSize="15" Margin="0,4,0,0"/>
                 </StackPanel>
             </StackPanel>

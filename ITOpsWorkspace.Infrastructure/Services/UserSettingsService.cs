@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
 using ITOpsWorkspace.Infrastructure.Data;
@@ -30,13 +31,16 @@ public class UserSettingsService : IUserSettingsService
         var entity = await db.Settings.FirstOrDefaultAsync();
         if (entity is null) return null;
 
+        Enum.TryParse<UserRole>(entity.Role, out var role);
+
         return new UserConnectionSettings
         {
             Username = entity.Username,
             Password = CredentialProtector.Unprotect(entity.EncryptedPassword),
             CurrentUserDisplayName = entity.CurrentUserDisplayName,
             AssignmentGroupName = entity.AssignmentGroupName,
-            IdleTimeoutMinutes = entity.IdleTimeoutMinutes
+            IdleTimeoutMinutes = entity.IdleTimeoutMinutes,
+            Role = role
         };
     }
 
@@ -52,6 +56,7 @@ public class UserSettingsService : IUserSettingsService
         entity.CurrentUserDisplayName = settings.CurrentUserDisplayName;
         entity.AssignmentGroupName = settings.AssignmentGroupName;
         entity.IdleTimeoutMinutes = settings.IdleTimeoutMinutes;
+        entity.Role = settings.Role.ToString();
 
         if (!await db.Settings.AnyAsync(s => s.Id == entity.Id))
             db.Settings.Add(entity);

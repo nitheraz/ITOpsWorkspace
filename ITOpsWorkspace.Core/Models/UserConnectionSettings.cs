@@ -1,4 +1,6 @@
-﻿namespace ITOpsWorkspace.Core.Models;
+﻿using ITOpsWorkspace.Core.Enums;
+
+namespace ITOpsWorkspace.Core.Models;
 
 public class UserConnectionSettings
 {
@@ -7,4 +9,5 @@ public class UserConnectionSettings
     public string CurrentUserDisplayName { get; set; } = string.Empty;
     public string AssignmentGroupName { get; set; } = string.Empty;
     public int IdleTimeoutMinutes { get; set; } = 120;
+    public UserRole Role { get; set; } = UserRole.Technician;
 }

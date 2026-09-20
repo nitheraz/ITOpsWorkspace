@@ -1,9 +1,10 @@
-﻿namespace ITOpsWorkspace.Core.Interfaces;
+﻿using ITOpsWorkspace.Core.Enums;
+
+namespace ITOpsWorkspace.Core.Interfaces;
 
 public interface IUserLookupService
 {
     Task<string?> GetDisplayNameAsync(string instanceUrl, string username, string password);
-
-    // Returns every assignment group the user belongs to (could be zero, one, or several).
     Task<List<string>> GetAssignmentGroupNamesAsync(string instanceUrl, string username, string password);
+    Task<UserRole> DetermineRoleAsync(string instanceUrl, string username, string password, string assignmentGroupName);
 }

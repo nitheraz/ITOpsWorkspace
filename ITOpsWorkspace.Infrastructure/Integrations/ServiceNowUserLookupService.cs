@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Web;
+using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Interfaces;
 
 namespace ITOpsWorkspace.Infrastructure.Integrations;
@@ -50,6 +51,31 @@ public class ServiceNowUserLookupService : IUserLookupService
         }
 
         return groupNames;
+    }
+
+    // NOTE: this method is a stopgap left over from before the ITOpsWorkspace.Api role
+    // architecture existed. It'll be replaced in Phase 6 (WPF -> API authentication) —
+    // ServiceNow should not be determining ITOpsWorkspace application roles going forward.
+    public async Task<UserRole> DetermineRoleAsync(string instanceUrl, string username, string password, string assignmentGroupName)
+    {
+        using var client = CreateClient(instanceUrl, username, password);
+
+        var adminQuery = HttpUtility.UrlEncode($"user.user_name={username}^role.name=admin");
+        var adminUrl = $"/api/now/table/sys_user_has_role?sysparm_query={adminQuery}&sysparm_fields=sys_id&sysparm_limit=1";
+        var adminDoc = await GetJsonAsync(client, adminUrl);
+        if (adminDoc is not null && adminDoc.RootElement.GetProperty("result").GetArrayLength() > 0)
+            return UserRole.Administrator;
+
+        if (!string.IsNullOrWhiteSpace(assignmentGroupName))
+        {
+            var groupQuery = HttpUtility.UrlEncode($"name={assignmentGroupName}^manager.user_name={username}");
+            var groupUrl = $"/api/now/table/sys_user_group?sysparm_query={groupQuery}&sysparm_fields=sys_id&sysparm_limit=1";
+            var groupDoc = await GetJsonAsync(client, groupUrl);
+            if (groupDoc is not null && groupDoc.RootElement.GetProperty("result").GetArrayLength() > 0)
+                return UserRole.ITManager;
+        }
+
+        return UserRole.Technician;
     }
 
     private static HttpClient CreateClient(string instanceUrl, string username, string password)

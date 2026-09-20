@@ -8,4 +8,5 @@ public class SettingsEntity
     public string CurrentUserDisplayName { get; set; } = string.Empty;
     public string AssignmentGroupName { get; set; } = string.Empty;
     public int IdleTimeoutMinutes { get; set; } = 120;
+    public string Role { get; set; } = "Technician";
 }
