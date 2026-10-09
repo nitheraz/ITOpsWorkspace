@@ -5,6 +5,7 @@ using ITOpsWorkspace.Api.Data;
 using ITOpsWorkspace.Api.Dtos;
 using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ITOpsWorkspace.Api.Controllers;
 
@@ -111,6 +112,58 @@ public class OnboardingController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "Administrator")]
+    [HttpPost("invite-user")]
+    public async Task<IActionResult> InviteUser([FromBody] InviteUserRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Name) ||
+            string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Role))
+        {
+            return BadRequest("Name, email, and role are all required.");
+        }
+
+        if (!Enum.TryParse<UserRole>(request.Role, ignoreCase: true, out var role))
+        {
+            return BadRequest("Role must be one of: Administrator, ITManager, Technician, ReadOnly.");
+        }
+
+        var orgIdClaim = User.FindFirst("org")?.Value;
+        if (!Guid.TryParse(orgIdClaim, out var organisationId))
+            return Unauthorized();
+
+        var email = request.Email.Trim().ToLowerInvariant();
+
+        if (await _db.Users.AnyAsync(u => u.Email == email))
+            return Conflict("A user with this email already exists.");
+
+        var user = new AppUser
+        {
+            OrganisationId = organisationId,
+            Name = request.Name,
+            Email = email,
+            Role = role,
+            Status = UserStatus.PendingInvitation
+        };
+
+        var invitation = new Invitation
+        {
+            UserId = user.Id,
+            Token = GenerateToken(),
+            ExpiresAt = DateTime.UtcNow.AddDays(7)
+        };
+
+        _db.Users.Add(user);
+        _db.Invitations.Add(invitation);
+        await _db.SaveChangesAsync();
+
+        return Ok(new InviteUserResponse
+        {
+            UserId = user.Id,
+            InvitationToken = invitation.Token,
+            ExpiresAt = invitation.ExpiresAt
+        });
+    }
     private static string GenerateToken()
     {
         var bytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);

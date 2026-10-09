@@ -7,6 +7,8 @@ using ITOpsWorkspace.App.Services;
 using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
+using System.Windows;
+using ITOpsWorkspace.App.Views;
 
 namespace ITOpsWorkspace.App.ViewModels;
 
@@ -224,20 +226,88 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
         ActionMessage = "Assigned to you.";
     }
 
+
     [RelayCommand]
     private async Task ApplyStatus()
     {
-        if (SelectedStateOption is null) return;
+        if (SelectedStateOption is null)
+            return;
 
         IsSaving = true;
         ActionMessage = string.Empty;
 
-        await _incidentSource.UpdateStateAsync(Incident.ServiceNowSysId, SelectedStateOption.Value);
+        try
+        {
+            var selectedState = SelectedStateOption;
 
-        await RefreshAsync();
+            if (string.Equals(
+                selectedState.Label,
+                "Resolved",
+                StringComparison.OrdinalIgnoreCase))
+            {
+                var resolutionCodes =
+                    await _incidentSource.GetIncidentResolutionCodesAsync();
 
-        IsSaving = false;
-        ActionMessage = "Status updated.";
+                if (resolutionCodes.Count == 0)
+                {
+                    MessageBox.Show(
+                        "ServiceNow returned no available resolution codes. " +
+                        "Check the incident close-code choices and your permissions.",
+                        "Resolution Codes Unavailable",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+
+                    return;
+                }
+
+                var dialog = new ResolutionDialog(resolutionCodes);
+
+                if (Application.Current?.MainWindow is Window owner &&
+                    owner.IsVisible)
+                {
+                    dialog.Owner = owner;
+                }
+
+                if (dialog.ShowDialog() != true)
+                    return;
+
+                await _incidentSource.ResolveIncidentAsync(
+                    Incident.ServiceNowSysId,
+                    selectedState.Value,
+                    dialog.SelectedResolutionCode,
+                    dialog.ResolutionNotes);
+            }
+            else
+            {
+                // Preserve the existing behavior for other statuses.
+                await _incidentSource.UpdateStateAsync(
+                    Incident.ServiceNowSysId,
+                    selectedState.Value);
+            }
+
+            await RefreshAsync();
+
+            ActionMessage = string.Equals(
+                selectedState.Label,
+                "Resolved",
+                StringComparison.OrdinalIgnoreCase)
+                    ? "Incident resolved successfully."
+                    : "Status updated.";
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = string.Empty;
+
+            MessageBox.Show(
+                $"The incident status could not be updated.\n\n{ex.Message}",
+                "Status Update Failed",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 
     private async Task RefreshAsync()

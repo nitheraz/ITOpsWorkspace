@@ -120,6 +120,68 @@ public class ServiceNowIncidentSource : IIncidentSource
         return options;
     }
 
+
+    public async Task<List<IncidentResolutionCode>> GetIncidentResolutionCodesAsync()
+    {
+        var query = HttpUtility.UrlEncode(
+            "name=incident^element=close_code^inactive=false");
+
+        var url = $"/api/now/table/sys_choice" +
+                  $"?sysparm_query={query}^ORDERBYsequence" +
+                  "&sysparm_fields=value,label&sysparm_limit=100";
+
+        var response = await _client.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(json);
+
+        var results = doc.RootElement.GetProperty("result");
+        var codes = new List<IncidentResolutionCode>();
+
+        foreach (var item in results.EnumerateArray())
+        {
+            var value = GetRawValue(item, "value");
+            var label = GetRawValue(item, "label");
+
+            if (string.IsNullOrWhiteSpace(value) ||
+                string.IsNullOrWhiteSpace(label))
+            {
+                continue;
+            }
+
+            codes.Add(new IncidentResolutionCode
+            {
+                Value = value,
+                Label = label
+            });
+        }
+
+        return codes;
+    }
+
+    public Task ResolveIncidentAsync(
+        string sysId,
+        string stateValue,
+        string resolutionCode,
+        string resolutionNotes)
+    {
+        if (string.IsNullOrWhiteSpace(resolutionCode))
+            throw new ArgumentException(
+                "A resolution code is required.", nameof(resolutionCode));
+
+        if (string.IsNullOrWhiteSpace(resolutionNotes))
+            throw new ArgumentException(
+                "Resolution notes are required.", nameof(resolutionNotes));
+
+        return PatchIncidentAsync(sysId, new Dictionary<string, string>
+        {
+            ["state"] = stateValue,
+            ["close_code"] = resolutionCode,
+            ["close_notes"] = resolutionNotes.Trim()
+        });
+    }
+
     public Task AddWorkNoteAsync(string sysId, string note) =>
         PatchIncidentAsync(sysId, new Dictionary<string, string> { ["work_notes"] = note });
 
@@ -202,20 +264,35 @@ public class ServiceNowIncidentSource : IIncidentSource
         return articles;
     }
 
-    private async Task PatchIncidentAsync(string sysId, Dictionary<string, string> fields, bool inputDisplayValue = false)
+    private async Task PatchIncidentAsync(
+        string sysId,
+        Dictionary<string, string> fields,
+        bool inputDisplayValue = false)
     {
         var url = $"/api/now/table/incident/{sysId}";
+
         if (inputDisplayValue)
             url += "?sysparm_input_display_value=true";
 
         var json = JsonSerializer.Serialize(fields);
-        var request = new HttpRequestMessage(HttpMethod.Patch, url)
+
+        using var request = new HttpRequestMessage(HttpMethod.Patch, url)
         {
-            Content = new StringContent(json, Encoding.UTF8, "application/json")
+            Content = new StringContent(
+                json, Encoding.UTF8, "application/json")
         };
 
-        var response = await _client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        using var response = await _client.SendAsync(request);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync();
+
+            throw new HttpRequestException(
+                $"ServiceNow rejected the incident update " +
+                $"(HTTP {(int)response.StatusCode} {response.ReasonPhrase}). " +
+                $"Details: {errorBody}");
+        }
     }
 
     private static Incident MapIncident(JsonElement item) => new Incident
