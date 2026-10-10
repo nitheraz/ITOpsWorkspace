@@ -3,33 +3,57 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <DockPanel Margin="30">
-        <Button DockPanel.Dock="Top" Content="← Back" Command="{Binding BackCommand}"
-                Style="{StaticResource RowButtonStyle}" HorizontalAlignment="Left"
-                Padding="10,6" Margin="0,0,0,20" Cursor="Hand"/>
+        <Button DockPanel.Dock="Top"
+                Content="← Back"
+                Command="{Binding BackCommand}"
+                Style="{StaticResource RowButtonStyle}"
+                HorizontalAlignment="Left"
+                Padding="10,6"
+                Margin="0,0,0,20"
+                Cursor="Hand"/>
 
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel>
 
+                <!-- Incident Header -->
                 <Grid Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding Incident.Number}"
-                               FontSize="16" Foreground="{StaticResource TextSecondaryBrush}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding Incident.StateDisplay}"
-                               FontSize="14" Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding Incident.Number}"
+                               FontSize="16"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
+
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding Incident.StateDisplay}"
+                               FontSize="14"
+                               Foreground="{StaticResource TextSecondaryBrush}"/>
                 </Grid>
-                <TextBlock Text="{Binding Incident.Title}" FontSize="26" FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,20"
+
+                <TextBlock Text="{Binding Incident.Title}"
+                           FontSize="26"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextPrimaryBrush}"
+                           Margin="0,0,0,20"
                            TextWrapping="Wrap"/>
 
-                <TextBlock Text="{Binding ActionMessage}" Foreground="{StaticResource SuccessBrush}"
-                           FontSize="13" Margin="0,0,0,16"/>
+                <TextBlock Text="{Binding ActionMessage}"
+                           Foreground="{StaticResource SuccessBrush}"
+                           FontSize="13"
+                           Margin="0,0,0,16"
+                           TextWrapping="Wrap"/>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <!-- Quick Actions -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,20">
                     <StackPanel>
-                        <TextBlock Text="Quick Actions" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,12"/>
+                        <TextBlock Text="Quick Actions"
+                                   Style="{StaticResource StatLabelStyle}"
+                                   Margin="0,0,0,12"/>
+
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -39,46 +63,77 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="0" Content="Assign to Me" Command="{Binding AssignToMeCommand}"
+                            <Button Grid.Column="0"
+                                    Content="Assign to Me"
+                                    Command="{Binding AssignToMeCommand}"
                                     Style="{StaticResource PrimaryButtonStyle}"/>
 
-                            <ComboBox Grid.Column="2" Style="{StaticResource DarkComboBoxStyle}"
-                                      ItemsSource="{Binding StateOptions}" DisplayMemberPath="Label"
-                                      SelectedItem="{Binding SelectedStateOption}" Height="36"/>
+                            <ComboBox Grid.Column="2"
+                                      Style="{StaticResource DarkComboBoxStyle}"
+                                      ItemsSource="{Binding StateOptions}"
+                                      DisplayMemberPath="Label"
+                                      SelectedItem="{Binding SelectedStateOption}"
+                                      Height="36"/>
 
-                            <Button Grid.Column="4" Content="Apply Status" Command="{Binding ApplyStatusCommand}"
+                            <Button Grid.Column="4"
+                                    Content="Apply Status"
+                                    Command="{Binding ApplyStatusCommand}"
                                     Style="{StaticResource PrimaryButtonStyle}"/>
                         </Grid>
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <!-- Description -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,20">
                     <StackPanel>
-                        <TextBlock Text="Description" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Description"
+                                   Style="{StaticResource StatLabelStyle}"
+                                   Margin="0,0,0,8"/>
+
                         <TextBlock Text="{Binding Incident.Description}"
-                                   Foreground="{StaticResource TextPrimaryBrush}" FontSize="15"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   FontSize="15"
                                    TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
 
-                <UniformGrid Columns="4" Margin="0,0,0,20">
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+                <!-- Incident Summary -->
+                <UniformGrid Columns="4"
+                             Margin="0,0,0,20">
+
+                    <Border Style="{StaticResource CardStyle}"
+                            Margin="0,0,12,0">
                         <StackPanel>
-                            <TextBlock Text="Requester" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock Text="Requester"
+                                       Style="{StaticResource StatLabelStyle}"/>
+
                             <TextBlock Text="{Binding Incident.RequesterName}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" FontSize="15" Margin="0,4,0,0"/>
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="15"
+                                       Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+
+                    <Border Style="{StaticResource CardStyle}"
+                            Margin="0,0,12,0">
                         <StackPanel>
-                            <TextBlock Text="Assigned To" Style="{StaticResource StatLabelStyle}"/>
-                            <TextBlock Foreground="{StaticResource TextPrimaryBrush}" FontSize="15" Margin="0,4,0,0">
+                            <TextBlock Text="Assigned To"
+                                       Style="{StaticResource StatLabelStyle}"/>
+
+                            <TextBlock Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="15"
+                                       Margin="0,4,0,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding Incident.AssignedToName}"/>
+                                        <Setter Property="Text"
+                                                Value="{Binding Incident.AssignedToName}"/>
+
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Incident.AssignedToName}" Value="">
-                                                <Setter Property="Text" Value="Unassigned"/>
+                                            <DataTrigger Binding="{Binding Incident.AssignedToName}"
+                                                         Value="">
+                                                <Setter Property="Text"
+                                                        Value="Unassigned"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -86,52 +141,82 @@
                             </TextBlock>
                         </StackPanel>
                     </Border>
-                    <Border Style="{StaticResource CardStyle}" Margin="0,0,12,0">
+
+                    <Border Style="{StaticResource CardStyle}"
+                            Margin="0,0,12,0">
                         <StackPanel>
-                            <TextBlock Text="Priority" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock Text="Priority"
+                                       Style="{StaticResource StatLabelStyle}"/>
+
                             <TextBlock Text="{Binding Incident.PriorityDisplay}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" FontSize="15" Margin="0,4,0,0"/>
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="15"
+                                       Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
+
                     <Border Style="{StaticResource CardStyle}">
                         <StackPanel>
-                            <TextBlock Text="Created" Style="{StaticResource StatLabelStyle}"/>
+                            <TextBlock Text="Created"
+                                       Style="{StaticResource StatLabelStyle}"/>
+
                             <TextBlock Text="{Binding Incident.CreatedAt, StringFormat='{}{0:MMM d, yyyy h:mm tt}'}"
-                                       Foreground="{StaticResource TextPrimaryBrush}" FontSize="15" Margin="0,4,0,0"/>
+                                       Foreground="{StaticResource TextPrimaryBrush}"
+                                       FontSize="15"
+                                       Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                 </UniformGrid>
 
                 <!-- Device -->
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,24">
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,24">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="Device" Style="{StaticResource StatLabelStyle}"/>
-                            <TextBlock FontSize="15" Margin="0,4,0,0">
+                            <TextBlock Text="Device"
+                                       Style="{StaticResource StatLabelStyle}"/>
+
+                            <TextBlock FontSize="15"
+                                       Margin="0,4,0,0">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
-                                        <Setter Property="Text" Value="{Binding Incident.AssetName}"/>
+                                        <Setter Property="Foreground"
+                                                Value="{StaticResource TextPrimaryBrush}"/>
+
+                                        <Setter Property="Text"
+                                                Value="{Binding Incident.AssetName}"/>
+
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Incident.AssetName}" Value="">
-                                                <Setter Property="Text" Value="No linked device"/>
-                                                <Setter Property="Foreground" Value="{StaticResource TextSecondaryBrush}"/>
+                                            <DataTrigger Binding="{Binding Incident.AssetName}"
+                                                         Value="">
+                                                <Setter Property="Text"
+                                                        Value="No linked device"/>
+
+                                                <Setter Property="Foreground"
+                                                        Value="{StaticResource TextSecondaryBrush}"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </TextBlock.Style>
                             </TextBlock>
                         </StackPanel>
-                        <Button Grid.Column="1" Content="View Asset" Command="{Binding ViewAssetCommand}">
+
+                        <Button Grid.Column="1"
+                                Content="View Asset"
+                                Command="{Binding ViewAssetCommand}">
                             <Button.Style>
-                                <Style TargetType="Button" BasedOn="{StaticResource SecondaryButtonStyle}">
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource SecondaryButtonStyle}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Incident.AssetSysId}" Value="">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        <DataTrigger Binding="{Binding Incident.AssetSysId}"
+                                                     Value="">
+                                            <Setter Property="Visibility"
+                                                    Value="Collapsed"/>
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -140,34 +225,55 @@
                     </Grid>
                 </Border>
 
-                <TextBlock Text="Troubleshooting Assistant" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+                <!-- Troubleshooting Assistant -->
+                <TextBlock Text="Troubleshooting Assistant"
+                           Style="{StaticResource StatLabelStyle}"
+                           Margin="0,0,0,10"/>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,20">
                     <StackPanel>
                         <ItemsControl ItemsSource="{Binding ChatMessages}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Margin="0,0,0,12">
-                                        <Border CornerRadius="8" Padding="12" MaxWidth="480">
+                                        <Border CornerRadius="8"
+                                                Padding="12"
+                                                MaxWidth="480">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="{StaticResource SurfaceBrush}"/>
-                                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                                    <Setter Property="Background"
+                                                            Value="{StaticResource SurfaceBrush}"/>
+
+                                                    <Setter Property="HorizontalAlignment"
+                                                            Value="Left"/>
+
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Role}" Value="User">
-                                                            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
-                                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                                        <DataTrigger Binding="{Binding Role}"
+                                                                     Value="User">
+                                                            <Setter Property="Background"
+                                                                    Value="{StaticResource AccentBrush}"/>
+
+                                                            <Setter Property="HorizontalAlignment"
+                                                                    Value="Right"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock Text="{Binding Text}" TextWrapping="Wrap" FontSize="14">
+
+                                            <TextBlock Text="{Binding Text}"
+                                                       TextWrapping="Wrap"
+                                                       FontSize="14">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                                                        <Setter Property="Foreground"
+                                                                Value="{StaticResource TextPrimaryBrush}"/>
+
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Role}" Value="User">
-                                                                <Setter Property="Foreground" Value="White"/>
+                                                            <DataTrigger Binding="{Binding Role}"
+                                                                         Value="User">
+                                                                <Setter Property="Foreground"
+                                                                        Value="White"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -175,7 +281,8 @@
                                             </TextBlock>
                                         </Border>
 
-                                        <ItemsControl ItemsSource="{Binding Suggestions}" Margin="0,8,0,0">
+                                        <ItemsControl ItemsSource="{Binding Suggestions}"
+                                                      Margin="0,8,0,0">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <Button Content="{Binding Label}"
@@ -194,7 +301,9 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
-                        <TextBlock Text="Thinking..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"
+                        <TextBlock Text="Thinking..."
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   FontSize="13"
                                    Margin="0,0,0,8"
                                    Visibility="{Binding IsChatBusy, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
@@ -204,88 +313,281 @@
                                 <ColumnDefinition Width="10"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox x:Name="ChatInputBox" Grid.Column="0"
+
+                            <TextBox x:Name="ChatInputBox"
+                                     Grid.Column="0"
                                      Text="{Binding ChatInput, UpdateSourceTrigger=PropertyChanged}"
-                                     Padding="10" Background="{StaticResource SurfaceBrush}"
-                                     Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"
+                                     Padding="10"
+                                     Background="{StaticResource SurfaceBrush}"
+                                     Foreground="{StaticResource TextPrimaryBrush}"
+                                     BorderBrush="{StaticResource BorderBrush2}"
                                      KeyDown="ChatInputBox_KeyDown"/>
-                            <Button Grid.Column="2" Content="Send" Command="{Binding SendChatMessageCommand}"
+
+                            <Button Grid.Column="2"
+                                    Content="Send"
+                                    Command="{Binding SendChatMessageCommand}"
                                     Style="{StaticResource PrimaryButtonStyle}"/>
                         </Grid>
                     </StackPanel>
                 </Border>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16"
-                        Visibility="{Binding ActiveRun, Converter={StaticResource NullToVisibilityConverter}}">
+                <!-- Active Playbook Runs -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,16">
                     <StackPanel>
-                        <TextBlock Text="{Binding ActiveRun.PlaybookTitle}" FontSize="16" FontWeight="Bold"
-                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,10"/>
-                        <ItemsControl ItemsSource="{Binding ActiveRun.StepStates}">
+                        <TextBlock Text="Active Playbook Runs"
+                                   Style="{StaticResource StatLabelStyle}"
+                                   Margin="0,0,0,12"/>
+
+                        <TextBlock Text="No active playbook runs for this incident."
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding ActiveRuns.Count}"
+                                                           Value="0"/>
+                                                <Condition Binding="{Binding IsLoadingPlaybooks}"
+                                                           Value="False"/>
+                                            </MultiDataTrigger.Conditions>
+
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding ActiveRuns}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <CheckBox Content="{Binding StepText}" IsChecked="{Binding IsChecked}"
-                                              Command="{Binding DataContext.ToggleRunStepCommand,
-                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                              CommandParameter="{Binding}"
-                                              Foreground="{StaticResource TextPrimaryBrush}" FontSize="14"
-                                              Margin="0,0,0,8"/>
+                                    <Border Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource BorderBrush2}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="12"
+                                            Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0"
+                                                        Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding PlaybookTitle}"
+                                                           FontSize="14"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                                           TextWrapping="Wrap"/>
+
+                                                <TextBlock Text="{Binding IncidentNumber, StringFormat='Incident {0}'}"
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"/>
+                                            </StackPanel>
+
+                                            <Button Grid.Column="1"
+                                                    Content="Resume"
+                                                    Command="{Binding DataContext.ResumePlaybookCommand,
+                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource SecondaryButtonStyle}"
+                                                    VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <Button Content="Mark Playbook Complete" Command="{Binding CompleteRunCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left" Margin="0,10,0,0"/>
                     </StackPanel>
                 </Border>
 
-                <ItemsControl ItemsSource="{Binding MatchedPlaybooks}" Margin="0,0,0,10">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold"
-                                                   Foreground="{StaticResource TextPrimaryBrush}"/>
-                                        <TextBlock Text="{Binding Description}" FontSize="13"
-                                                   Foreground="{StaticResource TextSecondaryBrush}" Margin="0,2,0,0"/>
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Content="Start"
-                                            Command="{Binding DataContext.StartPlaybookCommand,
-                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource PrimaryButtonStyle}"/>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!-- Selected Playbook Checklist -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,16"
+                        Visibility="{Binding ActiveRun, Converter={StaticResource NullToVisibilityConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ActiveRun.PlaybookTitle}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextPrimaryBrush}"
+                                   Margin="0,0,0,4"
+                                   TextWrapping="Wrap"/>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12"
-                        Visibility="{Binding IsLoadingArticles, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Searching Knowledge Base..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
+                        <TextBlock Text="{Binding ActiveRun.IncidentNumber, StringFormat='Incident {0}'}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,14"/>
+
+                        <ItemsControl ItemsSource="{Binding ActiveRun.StepStates}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding StepText}"
+                                              IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              IsThreeState="False"
+                                              Command="{Binding DataContext.ToggleRunStepCommand,
+                                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                              CommandParameter="{Binding}"
+                                              Foreground="{StaticResource TextPrimaryBrush}"
+                                              FontSize="14"
+                                              Margin="0,0,0,10"
+                                              Padding="0,2"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <TextBlock Text="Saving checklist..."
+                                   FontSize="12"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,8"
+                                   Visibility="{Binding IsPlaybookBusy, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <Button Content="Mark Playbook Complete"
+                                Command="{Binding CompleteRunCommand}"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                HorizontalAlignment="Left"
+                                Margin="0,10,0,0"/>
+                    </StackPanel>
                 </Border>
 
-                <ItemsControl ItemsSource="{Binding TroubleshootingArticles}" Margin="0,0,0,20">
+                <!-- Available Playbooks -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="Choose a Playbook"
+                                   Style="{StaticResource StatLabelStyle}"
+                                   Margin="0,0,0,4"/>
+
+                        <TextBlock Text="Select a troubleshooting procedure for this incident. Starting an active playbook resumes its existing progress."
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Loading playbooks..."
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                   Margin="0,0,0,10"
+                                   Visibility="{Binding IsLoadingPlaybooks, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                        <TextBlock Text="No playbooks have been created yet."
+                                   FontSize="13"
+                                   Foreground="{StaticResource TextSecondaryBrush}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed"/>
+
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsLoadingPlaybooks}"
+                                                           Value="False"/>
+                                                <Condition Binding="{Binding MatchedPlaybooks.Count}"
+                                                           Value="0"/>
+                                            </MultiDataTrigger.Conditions>
+
+                                            <Setter Property="Visibility"
+                                                    Value="Visible"/>
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ItemsControl ItemsSource="{Binding MatchedPlaybooks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource SurfaceBrush}"
+                                            BorderBrush="{StaticResource BorderBrush2}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="14"
+                                            Margin="0,0,0,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0"
+                                                        Margin="0,0,12,0">
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontSize="15"
+                                                           FontWeight="Bold"
+                                                           Foreground="{StaticResource TextPrimaryBrush}"
+                                                           TextWrapping="Wrap"/>
+
+                                                <TextBlock Text="{Binding Description}"
+                                                           FontSize="13"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,4,0,0"
+                                                           TextWrapping="Wrap"/>
+
+                                                <TextBlock Text="{Binding Steps.Count, StringFormat='{}{0} steps'}"
+                                                           FontSize="12"
+                                                           Foreground="{StaticResource TextSecondaryBrush}"
+                                                           Margin="0,8,0,0"/>
+                                            </StackPanel>
+
+                                            <Button Grid.Column="1"
+                                                    Content="Start / Resume"
+                                                    Command="{Binding DataContext.StartPlaybookCommand,
+                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource PrimaryButtonStyle}"
+                                                    VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Knowledge Base Loading -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,12"
+                        Visibility="{Binding IsLoadingArticles, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Searching Knowledge Base..."
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="14"/>
+                </Border>
+
+                <!-- Knowledge Articles -->
+                <ItemsControl ItemsSource="{Binding TroubleshootingArticles}"
+                              Margin="0,0,0,20">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                            <Border Style="{StaticResource CardStyle}"
+                                    Margin="0,0,0,10">
                                 <Button Style="{StaticResource RowButtonStyle}"
                                         Command="{Binding DataContext.OpenArticleCommand,
                                                   RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}"
-                                        HorizontalContentAlignment="Stretch" Cursor="Hand">
+                                        HorizontalContentAlignment="Stretch"
+                                        Cursor="Hand">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="100"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding Number}"
-                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="13"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding ShortDescription}"
-                                                   Foreground="{StaticResource AccentBrush}" FontSize="14"
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Number}"
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   FontSize="13"/>
+
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding ShortDescription}"
+                                                   Foreground="{StaticResource AccentBrush}"
+                                                   FontSize="14"
                                                    TextWrapping="Wrap"/>
                                     </Grid>
                                 </Button>
@@ -294,48 +596,76 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,20">
+                <!-- Add Work Note -->
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,20">
                     <StackPanel>
-                        <TextBlock Text="Add Work Note" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Add Work Note"
+                                   Style="{StaticResource StatLabelStyle}"
+                                   Margin="0,0,0,8"/>
+
                         <TextBox Text="{Binding NewWorkNote, UpdateSourceTrigger=PropertyChanged}"
-                                 AcceptsReturn="True" TextWrapping="Wrap" Height="70"
-                                 Padding="10" Margin="0,0,0,10"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 Height="70"
+                                 Padding="10"
+                                 Margin="0,0,0,10"
                                  Background="{StaticResource SurfaceBrush}"
-                                 Foreground="{StaticResource TextPrimaryBrush}" BorderBrush="{StaticResource BorderBrush2}"/>
-                        <Button Content="Add Note" Command="{Binding AddWorkNoteCommand}"
-                                Style="{StaticResource PrimaryButtonStyle}" HorizontalAlignment="Left"/>
+                                 Foreground="{StaticResource TextPrimaryBrush}"
+                                 BorderBrush="{StaticResource BorderBrush2}"/>
+
+                        <Button Content="Add Note"
+                                Command="{Binding AddWorkNoteCommand}"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                HorizontalAlignment="Left"/>
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="Activity" Style="{StaticResource StatLabelStyle}" Margin="0,0,0,10"/>
+                <!-- Activity -->
+                <TextBlock Text="Activity"
+                           Style="{StaticResource StatLabelStyle}"
+                           Margin="0,0,0,10"/>
 
-                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,12"
+                <Border Style="{StaticResource CardStyle}"
+                        Margin="0,0,0,12"
                         Visibility="{Binding IsLoadingActivity, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <TextBlock Text="Loading activity..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="14"/>
+                    <TextBlock Text="Loading activity..."
+                               Foreground="{StaticResource TextSecondaryBrush}"
+                               FontSize="14"/>
                 </Border>
 
                 <ItemsControl ItemsSource="{Binding Activity}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                            <Border Style="{StaticResource CardStyle}"
+                                    Margin="0,0,0,10">
                                 <StackPanel>
                                     <Grid Margin="0,0,0,6">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" FontSize="14">
-                                            <Run Text="{Binding Author}" FontWeight="Bold"
+
+                                        <TextBlock Grid.Column="0"
+                                                   FontSize="14">
+                                            <Run Text="{Binding Author}"
+                                                 FontWeight="Bold"
                                                  Foreground="{StaticResource TextPrimaryBrush}"/>
                                             <Run Text=" — "/>
-                                            <Run Text="{Binding Type}" Foreground="{StaticResource AccentBrush}"/>
+                                            <Run Text="{Binding Type}"
+                                                 Foreground="{StaticResource AccentBrush}"/>
                                         </TextBlock>
+
                                         <TextBlock Grid.Column="1"
                                                    Text="{Binding Timestamp, StringFormat='{}{0:MMM d, h:mm tt}'}"
-                                                   Foreground="{StaticResource TextSecondaryBrush}" FontSize="12"/>
+                                                   Foreground="{StaticResource TextSecondaryBrush}"
+                                                   FontSize="12"/>
                                     </Grid>
-                                    <TextBlock Text="{Binding Text}" Foreground="{StaticResource TextPrimaryBrush}"
-                                               FontSize="14" TextWrapping="Wrap"/>
+
+                                    <TextBlock Text="{Binding Text}"
+                                               Foreground="{StaticResource TextPrimaryBrush}"
+                                               FontSize="14"
+                                               TextWrapping="Wrap"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -346,4 +676,3 @@
         </ScrollViewer>
     </DockPanel>
 </UserControl>
-

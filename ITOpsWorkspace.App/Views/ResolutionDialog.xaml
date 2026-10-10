@@ -35,13 +35,15 @@
                        FontWeight="SemiBold"
                        Margin="0,0,0,7"/>
 
-          <ComboBox x:Name="ResolutionCodeComboBox"
+
+            <ComboBox x:Name="ResolutionCodeComboBox"
           Style="{StaticResource DarkComboBoxStyle}"
           ItemsSource="{Binding ResolutionCodes}"
           DisplayMemberPath="Label"
           SelectedValuePath="Value"
-          Height="36" SelectionChanged="ResolutionCodeComboBox_SelectionChanged"/>
-     
+          Height="36"/>
+
+
         </StackPanel>
 
         <TextBlock Grid.Row="2"

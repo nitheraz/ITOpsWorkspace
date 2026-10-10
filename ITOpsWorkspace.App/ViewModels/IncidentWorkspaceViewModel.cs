@@ -1,14 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using ITOpsWorkspace.App.Services;
+using ITOpsWorkspace.App.Views;
 using ITOpsWorkspace.Core.Enums;
 using ITOpsWorkspace.Core.Interfaces;
 using ITOpsWorkspace.Core.Models;
-using System.Windows;
-using ITOpsWorkspace.App.Views;
 
 namespace ITOpsWorkspace.App.ViewModels;
 
@@ -21,27 +21,57 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     private readonly IAssistantService _assistantService;
     private readonly CurrentUserContext _currentUser;
 
-    [ObservableProperty] private Incident _incident;
+    [ObservableProperty]
+    private Incident _incident;
 
     public ObservableCollection<ActivityEntry> Activity { get; } = new();
     public ObservableCollection<IncidentStateOption> StateOptions { get; } = new();
     public ObservableCollection<KnowledgeArticle> TroubleshootingArticles { get; } = new();
     public ObservableCollection<Playbook> MatchedPlaybooks { get; } = new();
+    public ObservableCollection<PlaybookRun> ActiveRuns { get; } = new();
     public ObservableCollection<AssistantMessage> ChatMessages { get; } = new();
 
-    [ObservableProperty] private PlaybookRun? _activeRun;
-    [ObservableProperty] private IncidentStateOption? _selectedStateOption;
-    [ObservableProperty] private string _newWorkNote = string.Empty;
-    [ObservableProperty] private string _chatInput = string.Empty;
-    [ObservableProperty] private bool _isLoadingActivity;
-    [ObservableProperty] private bool _isLoadingArticles;
-    [ObservableProperty] private bool _isChatBusy;
-    [ObservableProperty] private bool _isSaving;
-    [ObservableProperty] private string _actionMessage = string.Empty;
+    [ObservableProperty]
+    private PlaybookRun? _activeRun;
 
-    public IncidentWorkspaceViewModel(Incident incident, object originViewModel,
-        INavigationService navigationService, IIncidentSource incidentSource,
-        IPlaybookService playbookService, CurrentUserContext currentUser, IAssistantService assistantService)
+    [ObservableProperty]
+    private IncidentStateOption? _selectedStateOption;
+
+    [ObservableProperty]
+    private string _newWorkNote = string.Empty;
+
+    [ObservableProperty]
+    private string _chatInput = string.Empty;
+
+    [ObservableProperty]
+    private bool _isLoadingActivity;
+
+    [ObservableProperty]
+    private bool _isLoadingArticles;
+
+    [ObservableProperty]
+    private bool _isLoadingPlaybooks;
+
+    [ObservableProperty]
+    private bool _isChatBusy;
+
+    [ObservableProperty]
+    private bool _isSaving;
+
+    [ObservableProperty]
+    private bool _isPlaybookBusy;
+
+    [ObservableProperty]
+    private string _actionMessage = string.Empty;
+
+    public IncidentWorkspaceViewModel(
+        Incident incident,
+        object originViewModel,
+        INavigationService navigationService,
+        IIncidentSource incidentSource,
+        IPlaybookService playbookService,
+        CurrentUserContext currentUser,
+        IAssistantService assistantService)
     {
         _incident = incident;
         _originViewModel = originViewModel;
@@ -60,75 +90,169 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
 
     private async Task LoadInitialAssistantMessageAsync()
     {
-        IsChatBusy = true;
-        var greeting = await _assistantService.AskAsync(Incident.Title, Incident.Description, new List<AssistantMessage>(), "");
-        IsChatBusy = false;
+        try
+        {
+            IsChatBusy = true;
 
-        ChatMessages.Add(greeting);
+            var greeting = await _assistantService.AskAsync(
+                Incident.Title,
+                Incident.Description,
+                new List<AssistantMessage>(),
+                "");
+
+            ChatMessages.Add(greeting);
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The assistant could not load: {ex.Message}";
+        }
+        finally
+        {
+            IsChatBusy = false;
+        }
     }
 
     private async Task LoadActivityAsync()
     {
-        IsLoadingActivity = true;
-        var entries = await _incidentSource.GetActivityAsync(Incident.ServiceNowSysId);
-        Activity.Clear();
-        foreach (var entry in entries)
-            Activity.Add(entry);
-        IsLoadingActivity = false;
+        try
+        {
+            IsLoadingActivity = true;
+
+            var entries = await _incidentSource.GetActivityAsync(
+                Incident.ServiceNowSysId);
+
+            Activity.Clear();
+
+            foreach (var entry in entries)
+                Activity.Add(entry);
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"Activity could not be loaded: {ex.Message}";
+        }
+        finally
+        {
+            IsLoadingActivity = false;
+        }
     }
 
     private async Task LoadStateOptionsAsync()
     {
-        var options = await _incidentSource.GetIncidentStateOptionsAsync();
-        StateOptions.Clear();
-        foreach (var option in options)
-            StateOptions.Add(option);
+        try
+        {
+            var options = await _incidentSource.GetIncidentStateOptionsAsync();
 
-        SelectedStateOption = StateOptions.FirstOrDefault(o => o.Label == Incident.StateDisplay);
+            StateOptions.Clear();
+
+            foreach (var option in options)
+                StateOptions.Add(option);
+
+            SelectedStateOption = StateOptions.FirstOrDefault(
+                option => option.Label == Incident.StateDisplay);
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"Incident statuses could not be loaded: {ex.Message}";
+        }
     }
 
     private async Task LoadTroubleshootingArticlesAsync()
     {
-        IsLoadingArticles = true;
-        var articles = await _incidentSource.SearchKnowledgeArticlesAsync(Incident.Title);
-        TroubleshootingArticles.Clear();
-        foreach (var article in articles)
-            TroubleshootingArticles.Add(article);
-        IsLoadingArticles = false;
+        try
+        {
+            IsLoadingArticles = true;
+
+            var articles = await _incidentSource.SearchKnowledgeArticlesAsync(
+                Incident.Title);
+
+            TroubleshootingArticles.Clear();
+
+            foreach (var article in articles)
+                TroubleshootingArticles.Add(article);
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"Knowledge articles could not be loaded: {ex.Message}";
+        }
+        finally
+        {
+            IsLoadingArticles = false;
+        }
     }
 
     private async Task LoadPlaybooksAsync()
     {
-        var existingRun = await _playbookService.GetActiveRunAsync(Incident.ServiceNowSysId);
-        if (existingRun is not null)
+        try
         {
-            ActiveRun = existingRun;
-            return;
-        }
+            IsLoadingPlaybooks = true;
 
-        var matched = await _playbookService.SearchPlaybooksAsync(Incident.Title);
-        MatchedPlaybooks.Clear();
-        foreach (var p in matched)
-            MatchedPlaybooks.Add(p);
+            // Load every playbook so the technician can choose.
+            var playbooks = await _playbookService.SearchPlaybooksAsync(
+                string.Empty);
+
+            var activeRuns = await _playbookService.GetActiveRunsAsync(
+                Incident.ServiceNowSysId);
+
+            MatchedPlaybooks.Clear();
+
+            foreach (var playbook in playbooks)
+                MatchedPlaybooks.Add(playbook);
+
+            ActiveRuns.Clear();
+
+            foreach (var run in activeRuns)
+                ActiveRuns.Add(run);
+
+            // Keep the selected run if it is still active.
+            if (ActiveRun is not null)
+            {
+                ActiveRun = ActiveRuns.FirstOrDefault(
+                    run => run.Id == ActiveRun.Id);
+            }
+
+            // Otherwise select the most recently started active run.
+            ActiveRun ??= ActiveRuns.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"Playbooks could not be loaded: {ex.Message}";
+        }
+        finally
+        {
+            IsLoadingPlaybooks = false;
+        }
     }
 
     [RelayCommand]
     private async Task ViewAsset()
     {
-        if (string.IsNullOrWhiteSpace(Incident.AssetSysId)) return;
+        if (string.IsNullOrWhiteSpace(Incident.AssetSysId))
+            return;
 
-        var assetSource = App.Services.GetRequiredService<IAssetSource>();
-        var asset = await assetSource.GetAssetBySysIdAsync(Incident.AssetSysId);
-        if (asset is not null)
-            _navigationService.NavigateTo(new AssetDetailViewModel(asset, this, _navigationService));
+        try
+        {
+            var assetSource = App.Services.GetRequiredService<IAssetSource>();
+            var asset = await assetSource.GetAssetBySysIdAsync(Incident.AssetSysId);
+
+            if (asset is not null)
+            {
+                _navigationService.NavigateTo(
+                    new AssetDetailViewModel(asset, this, _navigationService));
+            }
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The asset could not be opened: {ex.Message}";
+        }
     }
 
     [RelayCommand]
     private async Task SendChatMessage()
     {
-        if (string.IsNullOrWhiteSpace(ChatInput)) return;
+        if (string.IsNullOrWhiteSpace(ChatInput) || IsChatBusy)
+            return;
 
-        var messageText = ChatInput;
+        var messageText = ChatInput.Trim();
         ChatInput = string.Empty;
 
         ChatMessages.Add(new AssistantMessage
@@ -138,12 +262,26 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
             Timestamp = DateTime.UtcNow
         });
 
-        IsChatBusy = true;
-        var response = await _assistantService.AskAsync(
-            Incident.Title, Incident.Description, ChatMessages.ToList(), messageText);
-        IsChatBusy = false;
+        try
+        {
+            IsChatBusy = true;
 
-        ChatMessages.Add(response);
+            var response = await _assistantService.AskAsync(
+                Incident.Title,
+                Incident.Description,
+                ChatMessages.ToList(),
+                messageText);
+
+            ChatMessages.Add(response);
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The assistant could not respond: {ex.Message}";
+        }
+        finally
+        {
+            IsChatBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -153,13 +291,20 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
         {
             case AssistantSuggestionType.KnowledgeArticle:
             case AssistantSuggestionType.WebSearch:
-                if (!string.IsNullOrEmpty(suggestion.Url))
-                    Process.Start(new ProcessStartInfo(suggestion.Url) { UseShellExecute = true });
+                if (!string.IsNullOrWhiteSpace(suggestion.Url))
+                {
+                    Process.Start(new ProcessStartInfo(suggestion.Url)
+                    {
+                        UseShellExecute = true
+                    });
+                }
+
                 break;
 
             case AssistantSuggestionType.Playbook:
                 if (suggestion.Playbook is not null)
                     await StartPlaybook(suggestion.Playbook);
+
                 break;
         }
     }
@@ -167,77 +312,208 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
     [RelayCommand]
     private async Task StartPlaybook(Playbook playbook)
     {
-        var run = await _playbookService.StartRunAsync(playbook.Id, Incident.ServiceNowSysId, Incident.Number);
-        ActiveRun = run;
-        MatchedPlaybooks.Clear();
+        if (playbook is null || IsPlaybookBusy)
+            return;
+
+        try
+        {
+            IsPlaybookBusy = true;
+            ActionMessage = string.Empty;
+
+            // The service returns an existing active run for this
+            // playbook and incident, rather than duplicating it.
+            var run = await _playbookService.StartRunAsync(
+                playbook.Id,
+                Incident.ServiceNowSysId,
+                Incident.Number);
+
+            var existingIndex = -1;
+
+            for (var i = 0; i < ActiveRuns.Count; i++)
+            {
+                if (ActiveRuns[i].Id == run.Id)
+                {
+                    existingIndex = i;
+                    break;
+                }
+            }
+
+            if (existingIndex >= 0)
+                ActiveRuns[existingIndex] = run;
+            else
+                ActiveRuns.Insert(0, run);
+
+            ActiveRun = run;
+            ActionMessage = $"Playbook selected: {run.PlaybookTitle}.";
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The playbook could not be started: {ex.Message}";
+        }
+        finally
+        {
+            IsPlaybookBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void ResumePlaybook(PlaybookRun run)
+    {
+        if (run is null)
+            return;
+
+        ActiveRun = ActiveRuns.FirstOrDefault(
+            activeRun => activeRun.Id == run.Id);
+
+        if (ActiveRun is not null)
+            ActionMessage = $"Resumed playbook: {ActiveRun.PlaybookTitle}.";
     }
 
     [RelayCommand]
     private async Task ToggleRunStep(PlaybookRunStepState state)
     {
-        await _playbookService.SetStepCheckedAsync(state.Id, state.IsChecked);
+        if (state is null || IsPlaybookBusy)
+            return;
+
+        try
+        {
+            IsPlaybookBusy = true;
+            ActionMessage = string.Empty;
+
+            await _playbookService.SetStepCheckedAsync(
+                state.Id,
+                state.IsChecked);
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The checklist change could not be saved: {ex.Message}";
+
+            // Reload the persisted run so the checkbox reflects
+            // the actual saved state if the update failed.
+            await LoadPlaybooksAsync();
+        }
+        finally
+        {
+            IsPlaybookBusy = false;
+        }
     }
 
     [RelayCommand]
     private async Task CompleteRun()
     {
-        if (ActiveRun is null) return;
+        if (ActiveRun is null || IsPlaybookBusy)
+            return;
 
-        await _playbookService.CompleteRunAsync(ActiveRun.Id);
-        ActiveRun = null;
-        ActionMessage = "Playbook completed.";
-        await LoadPlaybooksAsync();
+        var completedRunId = ActiveRun.Id;
+
+        try
+        {
+            IsPlaybookBusy = true;
+            ActionMessage = string.Empty;
+
+            await _playbookService.CompleteRunAsync(completedRunId);
+
+            ActiveRuns.Remove(
+                ActiveRuns.FirstOrDefault(run => run.Id == completedRunId)!);
+
+            ActiveRun = ActiveRuns.FirstOrDefault();
+
+            ActionMessage = "Playbook completed.";
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = ex.Message;
+            await LoadPlaybooksAsync();
+        }
+        finally
+        {
+            IsPlaybookBusy = false;
+        }
     }
 
     [RelayCommand]
     private void OpenArticle(KnowledgeArticle article)
     {
-        Process.Start(new ProcessStartInfo(article.Url) { UseShellExecute = true });
+        if (article is null || string.IsNullOrWhiteSpace(article.Url))
+            return;
+
+        Process.Start(new ProcessStartInfo(article.Url)
+        {
+            UseShellExecute = true
+        });
     }
 
     [RelayCommand]
     private async Task AddWorkNote()
     {
-        if (string.IsNullOrWhiteSpace(NewWorkNote)) return;
+        if (string.IsNullOrWhiteSpace(NewWorkNote) || IsSaving)
+            return;
 
-        IsSaving = true;
-        ActionMessage = string.Empty;
+        try
+        {
+            IsSaving = true;
+            ActionMessage = string.Empty;
 
-        await _incidentSource.AddWorkNoteAsync(Incident.ServiceNowSysId, NewWorkNote);
-        NewWorkNote = string.Empty;
+            await _incidentSource.AddWorkNoteAsync(
+                Incident.ServiceNowSysId,
+                NewWorkNote.Trim());
 
-        await RefreshAsync();
+            NewWorkNote = string.Empty;
 
-        IsSaving = false;
-        ActionMessage = "Work note added.";
+            await RefreshAsync();
+
+            ActionMessage = "Work note added.";
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The work note could not be added: {ex.Message}";
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
 
     [RelayCommand]
     private async Task AssignToMe()
     {
-        IsSaving = true;
-        ActionMessage = string.Empty;
+        if (IsSaving)
+            return;
 
-        await _incidentSource.AssignToUserAsync(Incident.ServiceNowSysId, _currentUser.DisplayName);
+        try
+        {
+            IsSaving = true;
+            ActionMessage = string.Empty;
 
-        await RefreshAsync();
+            await _incidentSource.AssignToUserAsync(
+                Incident.ServiceNowSysId,
+                _currentUser.DisplayName);
 
-        IsSaving = false;
-        ActionMessage = "Assigned to you.";
+            await RefreshAsync();
+
+            ActionMessage = "Assigned to you.";
+        }
+        catch (Exception ex)
+        {
+            ActionMessage = $"The incident could not be assigned: {ex.Message}";
+        }
+        finally
+        {
+            IsSaving = false;
+        }
     }
-
 
     [RelayCommand]
     private async Task ApplyStatus()
     {
-        if (SelectedStateOption is null)
+        if (SelectedStateOption is null || IsSaving)
             return;
-
-        IsSaving = true;
-        ActionMessage = string.Empty;
 
         try
         {
+            IsSaving = true;
+            ActionMessage = string.Empty;
+
             var selectedState = SelectedStateOption;
 
             if (string.Equals(
@@ -279,7 +555,6 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
             }
             else
             {
-                // Preserve the existing behavior for other statuses.
                 await _incidentSource.UpdateStateAsync(
                     Incident.ServiceNowSysId,
                     selectedState.Value);
@@ -312,7 +587,9 @@ public partial class IncidentWorkspaceViewModel : ObservableObject
 
     private async Task RefreshAsync()
     {
-        var refreshed = await _incidentSource.GetIncidentBySysIdAsync(Incident.ServiceNowSysId);
+        var refreshed = await _incidentSource.GetIncidentBySysIdAsync(
+            Incident.ServiceNowSysId);
+
         if (refreshed is not null)
             Incident = refreshed;
 
